@@ -1,10 +1,13 @@
 # InventoryManagement - Agent Instructions (`AGENTS.md`)
 
+> **CURRENT PHASE: PLANNING** — No code has been written yet. All PRDs are being aligned in `prd/`. Do NOT create migrations, patches, or assume anything is already implemented. When a PRD references another PRD's schema/API/component and a conflict is found, update the source PRD — do NOT create a separate "fix" or migration. The goal is a fully consistent spec before any implementation begins.
+
 **CRITICAL:** Never start changing the code without my confirmation, unless it is a trivial change. This is to prevent you from making incorrect changes to the codebase.
 
 ## 🚀 Workspace & Project Overview
 
 - **Project Name:** InventoryManagement
+- **Phase:** Planning (PRD alignment) — zero implementation exists
 - **PRD Directory:** `prd/` (contains all feature specs: `prd/prd-[feature-name].md`)
 - **Custom Skills Directory:** `.agents/skills/`
 

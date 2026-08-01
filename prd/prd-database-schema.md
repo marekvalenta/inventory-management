@@ -82,8 +82,8 @@ This PRD defines the foundational database layer for InventoryManagement. It tra
 
 **Acceptance Criteria:**
 - [ ] On startup, after migrations, the app checks if the `locations` table is empty.
-- [ ] If empty, it inserts a default Location (e.g., "Home" or "Root").
-- [ ] If empty, it inserts a default Settings row `(id=1, app_name="Inventory", theme="system")`.
+- [ ] If empty, it inserts a default Location (e.g., "Home" or "Root") and stores its UUID in `settings.root_location_id`.
+- [ ] If empty, it inserts a default Settings row `(id=1, app_name="Inventory", theme="system", root_location_id=<uuid-of-root>)`.
 
 ---
 
@@ -172,11 +172,12 @@ CREATE TABLE instance_field_values (
 );
 
 CREATE TABLE settings (
-    id          INTEGER PRIMARY KEY CHECK (id = 1),
-    app_name    TEXT NOT NULL DEFAULT 'Inventory',
-    theme       TEXT NOT NULL DEFAULT 'system',
-    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    id               INTEGER PRIMARY KEY CHECK (id = 1),
+    app_name         TEXT NOT NULL DEFAULT 'Inventory',
+    theme            TEXT NOT NULL DEFAULT 'system',
+    root_location_id TEXT REFERENCES locations(id),
+    created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 -- +goose StatementEnd
 
