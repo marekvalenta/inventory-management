@@ -332,7 +332,7 @@ Even though the above are non-goals for v1, the architecture must not block them
 > This section tracks all PRDs in the project. The canonical backlog is in `AGENTS.md`.
 
 | # | PRD File | Topic | Status |
-|---|---|---|---|
+|---|---|---|---|---|
 | 0 | `prd-overarching-architecture.md` | This document — high-level architecture, tech stack, data model | ✅ Done |
 | 1 | `prd-project-setup.md` | Repo structure, Go module, Vite init, Makefile, dev workflow | ✅ Done |
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Done |
@@ -342,8 +342,8 @@ Even though the above are non-goals for v1, the architecture must not block them
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
-| 9 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
-| 10 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
-| 11 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
-| 12 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | 🔲 Planned |
-| 13 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |
+| 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | 🔲 Planned |
+| 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |
+| 11 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
+| 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
+| 13 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |

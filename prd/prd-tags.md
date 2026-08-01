@@ -109,7 +109,7 @@ Tags are lightweight, user-defined labels that categorize item definitions. They
 - [ ] `PUT /api/v1/tags/:id` updates `name` and/or `color` (partial updates — only send changed fields).
 - [ ] Renaming to an already-used name returns `409 Conflict`.
 - [ ] Non-existent tag returns `404 Not Found`.
-- [ ] `updated_at` is set on change. (Note: schema currently lacks `updated_at` on tags — add via separate migration or handle in this migration.)
+- [ ] `updated_at` is set on change.
 - [ ] Typecheck / build / test suite passes.
 
 ### US-005: Delete a Tag (Cascade)
@@ -302,6 +302,6 @@ r.Delete("/{id}", tagHandler.Delete)
 
 | # | Question | Status |
 |---|----------|--------|
-| OQ-1 | Should there be an `updated_at` column on the `tags` table? | The initial migration lacks it. Either add a migration to include it, or omit it for tags. Locations have `updated_at`. Recommend adding for consistency — defer decision to implementation. |
+| OQ-1 | Should there be an `updated_at` column on the `tags` table? | Resolved — `updated_at` added to the initial migration in `prd-database-schema.md`. Consistent with locations and item_definitions. |
 | OQ-2 | Should the color field support a color picker widget in addition to text input? | Deferred — v1 uses text input with hex validation. A color picker can be added later. |
 | OQ-3 | Should deleting a tag have a soft-delete option (undo)? | Deferred — v1 is hard delete only. Undo would require confirmation/timeout UX not warranted for < 50 tags. |

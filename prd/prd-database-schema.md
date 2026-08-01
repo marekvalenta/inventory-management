@@ -122,7 +122,8 @@ CREATE TABLE tags (
     id          TEXT PRIMARY KEY,
     name        TEXT NOT NULL UNIQUE,
     color       TEXT,
-    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE item_definitions (

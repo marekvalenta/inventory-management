@@ -35,15 +35,16 @@
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Done |
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Done |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Done |
+| — | `prd-visual-design.md` | Complete visual design system — colors, typography, spacing, key page layouts, component states | ✅ Done |
 | 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Done |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
-| 9 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
-| 10 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
-| 11 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
-| 12 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | 🔲 Planned |
-| 13 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |
+| 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | 🔲 Planned |
+| 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |
+| 11 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
+| 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
+| 13 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
 
 ### Status Key
 - ✅ Done — PRD written and approved
