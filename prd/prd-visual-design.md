@@ -211,24 +211,23 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 ### 4.1 Mobile App Shell (375px viewport)
 
 ```
-┌─────────────────────────────────┐
-│  Inventory                [+]  │  Header (48px)
-│                               │  ┬ bg: --color-bg-surface
-│                               │  │ border-bottom: --color-border
-├─────────────────────────────────┤
-│                                 │
-│         Page Content            │  ┬ Scrollable area
-│                                 │  │ bg: --color-bg-base
-│                                 │  │ padding: --space-lg
-│                                 │
-│                                 │
-│                                 │
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │  Bottom Nav (56px)
-│  Locations Definitions  Tags  Settings │  ┬ bg: --color-bg-surface
-│                                 │  │ border-top: --color-border
-└─────────────────────────────────┘
++-----------------------------------+
+| Inventory                  [+]   |
+|                                   |  Header: 48px
+|                                   |  bg: --color-bg-surface
++-----------------------------------+
+|                                   |
+|        Page Content               |  Scrollable area
+|                                   |  bg: --color-bg-base
+|                                   |  padding: --space-lg
+|                                   |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |  Bottom Nav: 56px
+|  Locations  Definitions  Tags Set|  bg: --color-bg-surface
+|                                   |  border-top: --color-border
++-----------------------------------+
 ```
+- `[*]` = Locations icon, `[{]` = Definitions icon, `[#]` = Tags icon, `[=]` = Settings icon
 
 **Header details:**
 - 48px height, full-width
@@ -242,27 +241,26 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 - Each tab: icon (24px) above label (`--text-caption`)
 - Inactive tab: icon + label in `--color-text-secondary`
 - Active tab: icon + label in `--color-accent`, 2px top border accent bar (same width as tab segment)
-- Tap target: full segment height × width (≥ 44x44px)
+- Tap target: full segment height x width (>= 44x44px)
 
 ### 4.2 Desktop App Shell (1280px+ viewport)
 
 ```
-┌─────────┬──────────────────────────────────────────────────┐
-│         │  Page Title                           [+ Action] │  Header (56px)
-│  INV    │                                                  │  bg: --color-bg-surface
-│         │                                                  │  border-bottom: --color-border
-├─────────┼──────────────────────────────────────────────────┤
-│ 📍 Loc  │                                                  │
-│ 📦 Def  │              Page Content                        │
-│ 🏷 Tag  │       (max-width 960px, centered)               │
-│         │                                                  │
-│         │                                                  │
-│         │                                                  │
-│ ─────── │                                                  │
-│ ⚙ Set   │                                                  │
-│         │                                                  │
-└─────────┴──────────────────────────────────────────────────┘
-    240px                    remaining width
++----------+-------------------------------------------------+
+|          |  Page Title                        [+ Action]   |
+|   INV    |                                                 |
+|          |                                                 |
++----------+-------------------------------------------------+
+|          |                                                 |
+| [*] Loc  |              Page Content                       |
+| [{] Def  |       (max-width 960px, centered)              |
+| [#] Tag  |                                                 |
+|          |                                                 |
+| -------  |                                                 |
+| [=] Set  |                                                 |
+|          |                                                 |
++----------+-------------------------------------------------+
+  240px                  remaining width
 ```
 
 **Sidebar details:**
@@ -287,192 +285,228 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 ### 5.1 Location Tree Page (route: `/locations`)
 
 **Mobile:**
-```
-┌─────────────────────────────────┐
-│  Locations                  [+] │
-├─────────────────────────────────┤
-│ ┌─────────────────────────────┐ │
-│ │ ▼ Home                     │ │  Card (--color-bg-surface, --radius-md)
-│ │   ┌─────────────────────┐  │ │  │ padding: --space-lg
-│ │   │ ▶ Living Room       │  │ │  │ has sub-locations indicated
-│ │   └─────────────────────┘  │ │  │ by "▼" or "▶" icon
-│ │   ┌─────────────────────┐  │ │
-│ │   │ ▶ Workshop          │  │ │
-│ │   └─────────────────────┘  │ │
-│ └─────────────────────────────┘ │
-│ ┌─────────────────────────────┐ │
-│ │ ▶ Garage                   │ │  Top-level location (no parent)
-│ └─────────────────────────────┘ │
-│                                 │
-│   No locations yet —            │  Empty state
-│   tap + to add your first       │  │ centered, --text-secondary
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │
-└─────────────────────────────────┘
-```
 
-**Desktop:** Same card layout, centered at 640px max-width. Tree indentation via `--space-lg` + `--space-lg` per depth level. Parent border-left accent line (`--color-accent`, 2px) connecting indentation.
+```
++-----------------------------------+
+|  Locations                  [+]   |
++-----------------------------------+
+| +---------------------------------+ |
+| | [v] Home                      | |
+| |   +-------------------------+ | |
+| |   | [>] Living Room         | | |
+| |   +-------------------------+ | |
+| |   +-------------------------+ | |
+| |   | [>] Workshop            | | |
+| |   +-------------------------+ | |
+| +---------------------------------+ |
+| +---------------------------------+ |
+| | [>] Garage                    | |
+| +---------------------------------+ |
+|                                     |
+|   No locations yet --               |
+|   tap + to add your first           |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |
++-----------------------------------+
+```
+- `[v]` = expanded (children visible), `[>]` = collapsed
+- Outer cards use `--color-bg-surface`, `--radius-md`, padding `--space-lg`
+- Child rows indented by `--space-xl` per depth level, with a 2px vertical accent line
+
+**Desktop:** Same card layout, centered at 640px max-width. Tree indentation via `--space-lg` + `--space-lg` per depth level.
+
+**Empty state:** centered in content area:
+```
++-----------------------------------+
+|                                   |
+|          No locations yet         |
+|    Tap + to add your first        |
+|                                   |
+|          [+ Add First]           |
++-----------------------------------+
+```
 
 ### 5.2 Location Detail Page (route: `/locations/:id`)
 
 **Mobile:**
-```
-┌─────────────────────────────────┐
-│  ← Home                    [+] │  Header with back arrow + title
-├─────────────────────────────────┤
-│ ┌─────────────────────────────┐ │
-│ │ Home                        │ │  Location info card
-│ │ A cozy place to live        │ │  │ name (--text-h2)
-│ │ ─────────────────────────── │ │  │ description (--text-small, --text-secondary)
-│ │ ┌──────┐ ┌──────┐ ┌──────┐ │ │  │ actions: edit (pencil) + delete (trash)
-│ │ │ Edit │ │ Move │ │Delete│ │ │  │ buttons: --radius-sm, outlined
-│ │ └──────┘ └──────┘ └──────┘ │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│  Sub-Locations (3)        [+ Add]│  Section header (--text-h3)
-│ ┌─────────────────────────────┐ │
-│ │ 📁 Living Room     [>]     │ │  Sub-location row
-│ │ 📁 Workshop        [>]     │ │  │ icon + name, chevron right
-│ │ 📁 Storage Closet  [>]     │ │  │ bg: --color-bg-surface, --radius-sm
-│ └─────────────────────────────┘ │  │ tap → navigate to that location
-│                                 │
-│  Items (5)              [+ Add] │  Section header
-│ ┌─────────────────────────────┐ │
-│ │ 📦 M3 Screw (x50)  [>]     │ │  Instance row
-│ │ 📦 Wood Glue (x2)  [>]     │ │  │ definition name + quantity badge
-│ │ 📦 Hammer (x1)     [>]     │ │  │ tap → navigate to instance detail
-│ └─────────────────────────────┘ │
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │
-└─────────────────────────────────┘
-```
 
-**Desktop:** Max-width 800px, centered. Same sections, wider cards. Sub-locations and items in a 2-column grid if space allows, otherwise stacked.
+```
++-----------------------------------+
+|  <-- Home                   [+]   |
++-----------------------------------+
+| +---------------------------------+ |
+| | Home                          | |
+| | A cozy place to live          | |
+| | ----------------------         | |
+| | +--------+ +--------+ +------+ | |
+| | |  Edit  | |  Move  | |Delete| | |
+| | +--------+ +--------+ +------+ | |
+| +---------------------------------+ |
+|                                     |
+|  Sub-Locations (3)           [+Add] |
+| +---------------------------------+ |
+| | [D] Living Room           [>] | |
+| | [D] Workshop              [>] | |
+| | [D] Storage Closet        [>] | |
+| +---------------------------------+ |
+|                                     |
+|  Items (5)                  [+Add] |
+| +---------------------------------+ |
+| | [B] M3 Screw (x50)        [>] | |
+| | [B] Wood Glue (x2)        [>] | |
+| | [B] Hammer (x1)           [>] | |
+| +---------------------------------+ |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |
++-----------------------------------+
+```
+- `[D]` = sub-location folder icon, `[B]` = item/box icon, `[>]` = navigate arrow
+- Section headers: `--text-h3`, padding `--space-md`
+- Location info card: name `--text-h2`, description `--text-small` `--text-secondary`
+- Action buttons: Secondary variant (outlined), 36px height
+
+**Desktop:** Max-width 800px, centered. Same sections. Sub-locations and items in a 2-column grid if space allows.
 
 **Quantity badge:** inline pill, bg `--color-accent-muted`, text `--color-accent`, `--text-caption`, `--radius-full`.
 
 ### 5.3 Definitions List Page (route: `/definitions`)
 
 **Mobile:**
+
 ```
-┌─────────────────────────────────┐
-│  Definitions               [+] │
-├─────────────────────────────────┤
-│ ┌─────────────────────────────┐ │
-│ │ Screw                  pcs  │ │  Definition card
-│ │ Fasteners  Hardware         │ │  │ name (--text-body-strong)
-│ │ ───────────────────────     │ │  │ unit right-aligned (--text-small)
-│ │ 42 instances (150 total) [>]│ │  │ tag badges: --radius-full, --text-caption
-│ └─────────────────────────────┘ │  │ instance summary line (--text-small)
-│                                 │  │ tap → /definitions/:id
-│ ┌─────────────────────────────┐ │
-│ │ Toolbox                     │ │
-│ │ Storage                     │ │
-│ │ 3 instances (3 total)   [>] │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│   No definitions yet —          │  Empty state
-│   tap + to create your first    │
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │
-└─────────────────────────────────┘
++-----------------------------------+
+|  Definitions                [+]   |
++-----------------------------------+
+| +---------------------------------+ |
+| | Screw                    pcs  | |
+| | Fasteners  Hardware           | |
+| | ---------------------          | |
+| | 42 instances (150 total) [>]  | |
+| +---------------------------------+ |
+| +---------------------------------+ |
+| | Toolbox                       | |
+| | Storage                       | |
+| | 3 instances (3 total)    [>]  | |
+| +---------------------------------+ |
+|                                     |
+|   No definitions yet --             |
+|   tap + to create your first        |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |
++-----------------------------------+
 ```
+- Definition name: `--text-body-strong`
+- Unit: `--text-small`, right-aligned
+- Tag badges: `--radius-full`, `--text-caption`, bg `--color-tag-bg`
+- Instance summary: `--text-small`, `--color-text-secondary`
 
 **Desktop:** Max-width 720px, centered. Each card slightly wider, tag badges more spaced.
 
 ### 5.4 Definition Detail Page (route: `/definitions/:id`)
 
 **Mobile (tabbed layout):**
-```
-┌─────────────────────────────────┐
-│  ← Definitions                  │
-├─────────────────────────────────┤
-│  M3 Screw                       │  Name (--text-h1)
-│  pcs · inherits from Screw      │  Unit + parent link (--text-small)
-│  Fasteners  Hardware            │  Tag badges
-│  ┌──────┐ ┌──────┐ ┌──────┐    │
-│  │ Edit │ │Delete│             │  │  Actions
-│  └──────┘ └──────┘             │
-├─────────────────────────────────┤
-│  [Fields]   [Tags]   [Instances] │  Tab bar (--color-bg-surface-alt)
-│  ═══════                       │  │ active tab: amber underline (2px)
-├─────────────────────────────────┤
-│                                 │
-│  Own Fields                     │  Tab content (scrollable)
-│ ┌─────────────────────────────┐ │
-│ │ Field Name  │ Type  │ Req  │ │ │  Field table
-│ │ Material    │ enum  │  ✓   │ │ │  │ own fields: white bg rows
-│ │ ──────────────────────────── │ │  │ inherited fields: muted bg rows
-│ │ 🔒 Length   │number │  ✓   │ │ │  │ lock icon, parent label
-│ │  (from Screw)               │ │ │  │ cannot edit sealed fields
-│ └─────────────────────────────┘ │
-│  [+ Add Field]      [Save Fields]│  Action buttons
-│                                 │
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │
-└─────────────────────────────────┘
-```
 
-**Desktop:** Max-width 900px, centered. Tabs in a horizontal bar. Fields table wider with more columns visible.
+```
++-----------------------------------+
+|  <-- Definitions                  |
++-----------------------------------+
+|  M3 Screw                         |
+|  pcs . inherits from Screw        |
+|  Fasteners  Hardware              |
+|  +--------+ +--------+           |
+|  |  Edit  | | Delete |           |
+|  +--------+ +--------+           |
++-----------------------------------+
+|  [Fields]     [Tags]   [Instances] |
+|  ========                         |
++-----------------------------------+
+|                                   |
+|  Own Fields                       |
+| +---------------------------------+ |
+| | Field Name  | Type  | Req      | |
+| | Material    | enum  |  yes     | |
+| | ------------------------       | |
+| | (L) Length  | number|  yes     | |
+| |   (from Screw)                 | |
+| +---------------------------------+ |
+|  [+ Add Field]       [Save Fields] |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |
++-----------------------------------+
+```
+- `(L)` = lock icon for inherited sealed fields
+- `=======` = active tab underline in `--color-accent`, 2px
+- Tab bar: bg `--color-bg-surface-alt`
+- Own fields: standard white rows in field table
+- Inherited fields: muted bg rows with `(L)` lock indicator
+
+**Desktop:** Max-width 900px, centered. Tabs in a horizontal bar. Fields table wider with more columns.
 
 **Field table details:**
 - Header row: `--text-caption`, uppercase, `--color-text-secondary`, bg `--color-bg-surface-alt`
 - Own field rows: bg `--color-bg-surface`, border-bottom `--color-border`
-- Inherited field rows: bg `--color-bg-surface-alt` (slightly darker), lock icon in muted color, parent definition name in `--text-small` `--text-secondary`
-- Inherited overridable: editable default_value cell only, rest locked
+- Inherited field rows: bg `--color-bg-surface-alt` (slightly darker), lock icon in muted color
+- Inherited overridable: editable default_value cell only, rest locked out
 - Column widths (desktop): Name (25%), Type (15%), Required (10%), Default (25%), Child Editable (10%), Actions (15%)
-- Up/Down reorder arrows: 24x24px, `--color-text-secondary`, hover → `--color-accent`
+- Up/Down reorder arrows: 24x24px, `--color-text-secondary`, hover -> `--color-accent`
 
 ### 5.5 Instance Detail Page (route: `/instances/:id`)
 
 **Mobile:**
+
 ```
-┌─────────────────────────────────┐
-│  ← Back                         │
-├─────────────────────────────────┤
-│ ┌─────────────────────────────┐ │
-│ │ Home > Workshop > Toolbox   │ │  Breadcrumb bar (horizontal scroll)
-│ │ → [scroll for more →]       │ │  │ bg: --color-bg-surface-alt, rounded
-│ └─────────────────────────────┘ │  │ each segment: text + "/"
-│                                 │  │ last segment: --color-accent, bold
-│  M3 Screw                       │  Definition name (--text-h1)
-│  pcs                             │  Unit (--text-small)
-│  Quantity: ┌──────┐            │  Quantity badge
-│            │ x50  │            │  │ large pill, bg --color-accent-muted
-│            └──────┘            │
-│                                 │
-│  Located in: Workshop           │  Placement context (--text-body)
-│                                 │
-│  Field Values                   │  Section header (--text-h3)
-│ ┌─────────────────────────────┐ │
-│ │ Material      │ Steel      │ │  Field value rows
-│ │ Length        │ 12mm       │ │  │ label (--text-small, --text-secondary)
-│ │ Thread Pitch  │ 0.5mm      │ │  │ value (--text-body)
-│ └─────────────────────────────┘ │
-│  ┌──────┐                       │
-│  │ Edit │                       │  Edit button (opens modal)
-│  └──────┘                       │
-│                                 │
-│  Items inside (3)        [+ Add]│  Container children (if is_container)
-│ ┌─────────────────────────────┐ │
-│ │ 📦 Washer (x20)     [>]     │ │
-│ │ 📦 Nut (x50)        [>]     │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│  Actions                        │
-│  ┌──────────┐ ┌──────────┐    │
-│  │   Move   │ │  Delete  │    │  Move (amber outlined), Delete (danger)
-│  └──────────┘ └──────────┘    │
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │
-└─────────────────────────────────┘
++-----------------------------------+
+|  <-- Back                         |
++-----------------------------------+
+| +---------------------------------+ |
+| | Home > Workshop > Toolbox      | |
+| | -> scroll for more ->          | |
+| +---------------------------------+ |
+|                                     |
+|  M3 Screw                           |
+|  pcs                                |
+|  Quantity: +------+                |
+|            | x50  |                |
+|            +------+                |
+|                                     |
+|  Located in: Workshop               |
+|                                     |
+|  Field Values                       |
+| +---------------------------------+ |
+| | Material      | Steel          | |
+| | Length        | 12mm           | |
+| | Thread Pitch  | 0.5mm          | |
+| +---------------------------------+ |
+|  +--------+                         |
+|  |  Edit  |                         |
+|  +--------+                         |
+|                                     |
+|  Items inside (3)            [+Add] |
+| +---------------------------------+ |
+| | [B] Washer (x20)         [>]  | |
+| | [B] Nut (x50)            [>]  | |
+| +---------------------------------+ |
+|                                     |
+|  Actions                            |
+|  +-----------+  +-----------+      |
+|  |   Move    |  |  Delete   |      |
+|  +-----------+  +-----------+      |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |
++-----------------------------------+
 ```
+- Breadcrumb bar: bg `--color-bg-surface`, `--radius-md`, padding `--space-md`, horizontal scroll
+- Breadcrumb segments separated by " > ", last segment `--color-accent` bold, not clickable
+- Quantity badge: `--color-accent-muted` bg, `--color-accent` text, large pill
+- Field value rows: label `--text-small` `--text-secondary`, value `--text-body`
+- Container children section: only shown when definition's `is_container = true`
+- Move button: Secondary variant. Delete button: Danger variant
 
 **Desktop:** Max-width 800px, centered. Breadcrumb full-width. Field values in a 2-column card. Container children list wider.
 
 **Breadcrumb bar details:**
 - Background: `--color-bg-surface`, `--radius-md`, padding `--space-md`
-- Segments separated by " / " divider in `--color-text-secondary`
+- Segments separated by " > " divider in `--color-text-secondary`
 - Location segments: `--text-small`, `--color-text-secondary`, clickable (pointer cursor)
 - Instance segments: `--text-small`, `--color-text-secondary`, clickable
 - Current instance (last): `--text-body-strong`, `--color-accent`, not clickable
@@ -482,54 +516,65 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 ### 5.6 Tags Page (route: `/tags`)
 
 **Mobile:**
-```
-┌─────────────────────────────────┐
-│  Tags                      [+] │
-├─────────────────────────────────┤
-│ ┌─────────────────────────────┐ │
-│ │ [+ Add Tag]                │ │  Inline create form (collapsed)
-│ └─────────────────────────────┘ │  │ expands on tap → shows inputs
-│                                 │
-│ ┌─────────────────────────────┐ │
-│ │ ● Fasteners        5 defs  │ │  Tag row (--color-bg-surface, --radius-sm)
-│ │                    ✎  🗑    │ │  │ color swatch (14px circle, --radius-full)
-│ └─────────────────────────────┘ │  │ name (--text-body-strong)
-│ ┌─────────────────────────────┐ │  │ linked count as small badge
-│ │ ● Hardware         12 defs │ │  │ edit (pencil) + delete (trash) icons
-│ │                    ✎  🗑    │ │
-│ └─────────────────────────────┘ │
-│ ┌─────────────────────────────┐ │
-│ │ ○ Office           0 defs  │ │  │ No color → default grey swatch
-│ │                    ✎  🗑    │ │
-│ └─────────────────────────────┘ │
-│                                 │
-│   No tags yet —                 │  Empty state
-│   tap + to create your first    │
-├─────────────────────────────────┤
-│  📍         📦         🏷         ⚙   │
-└─────────────────────────────────┘
-```
 
-**Desktop:** Max-width 480px, centered. Tag rows wider, action icons have hover backgrounds (`--color-bg-surface-alt`).
+```
++-----------------------------------+
+|  Tags                       [+]   |
++-----------------------------------+
+| +---------------------------------+ |
+| | [+ Add Tag]                   | |
+| +---------------------------------+ |
+|                                     |
+| +---------------------------------+ |
+| | (o) Fasteners      5 defs     | |
+| |                    [e]  [x]   | |
+| +---------------------------------+ |
+| +---------------------------------+ |
+| | (o) Hardware      12 defs     | |
+| |                    [e]  [x]   | |
+| +---------------------------------+ |
+| +---------------------------------+ |
+| | (.) Office         0 defs     | |
+| |                    [e]  [x]   | |
+| +---------------------------------+ |
+|                                     |
+|   No tags yet --                    |
+|   tap + to create your first        |
++-----------------------------------+
+|  [*]        [{]        [#]  [=]  |
++-----------------------------------+
+```
+- `(o)` = colored swatch circle (14px, `--radius-full`), `(.)` = default grey
+- `[e]` = edit icon (pencil, 18x18px), `[x]` = delete icon (trash, 18x18px)
+- Tag name: `--text-body-strong`. Linked count: `--text-caption`, `--color-text-secondary`
+- Rows: bg `--color-bg-surface`, `--radius-sm`, padded
+
+**Desktop:** Max-width 480px, centered. Icons show hover backgrounds (`--color-bg-surface-alt`).
 
 **Inline create/edit form (expanded):**
+
 ```
-┌─────────────────────────────────────┐
-│ ┌─────────────────────────────────┐ │
-│ │ Name: [________________]       │ │  Text input (--radius-sm)
-│ │ Color: [#FF5733] [■]          │ │  │ color input with live swatch preview
-│ │                                 │ │  │ swatch: 24x24px, --radius-sm
-│ │         [Cancel]  [Save]       │ │  │ Cancel: text button, `--text-secondary`
-│ └─────────────────────────────────┘ │  │ Save: amber pill button
-└─────────────────────────────────────┘
++-----------------------------------+
+| Name:  [________________________]  |
+| Color: [#FF5733            ] [=]  |
+|                                    |
+|            [Cancel]    [Save]      |
++-----------------------------------+
 ```
+- `[=]` = live color swatch preview (24x24px, `--radius-sm`)
+- Text inputs: bg `--color-bg-surface`, border `--color-border`, `--radius-sm`, 40px tall
+- Cancel: text button, `--text-secondary`. Save: Primary amber pill button
 
 **Tag badge component (reusable across all pages):**
+
 ```
-┌─────────────────┐
-│ ● Fasteners     │  Pill: --radius-full, bg --color-tag-bg (or tag's own color at 15% opacity)
-└─────────────────┘  Swatch circle (14px) + text (--text-caption), padding --space-xs --space-sm
++-------------------+
+| (o) Fasteners     |
++-------------------+
 ```
+- `--radius-full` pill, bg `--color-tag-bg` (or tag's color at 15% opacity)
+- Left swatch: 14px `--radius-full` circle using tag's hex color
+- Text: `--text-caption`, padding `--space-xs` `--space-sm`
 
 ---
 
@@ -539,7 +584,7 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 
 | Variant | Use | Style |
 |---|---|---|
-| **Primary** | Main action (Save, Create, Move) | bg `--color-accent`, text `--color-text-inverse`, `--radius-md`, `--text-body-strong`, min height 40px, padding `--space-md` `--space-xl`, hover → `--color-accent-hover`, focus ring `--color-border-focus` 2px offset |
+| **Primary** | Main action (Save, Create, Move) | bg `--color-accent`, text `--color-text-inverse`, `--radius-md`, `--text-body-strong`, min height 40px, padding `--space-md` `--space-xl`, hover -> `--color-accent-hover`, focus ring `--color-border-focus` 2px offset |
 | **Secondary** | Alternate action (Cancel, Back) | bg transparent, text `--color-text-primary`, border `--color-border`, `--radius-md`, min height 40px, hover bg `--color-bg-surface-alt` |
 | **Danger** | Delete, destructive actions | bg transparent, text `--color-danger`, border `--color-danger`, `--radius-md`, hover bg `rgba(194,84,61,0.10)` |
 | **Ghost** | Inline icon actions (edit, delete in lists) | bg transparent, text `--color-text-secondary`, 36x36px tap target, `--radius-sm`, hover bg `--color-bg-surface-alt` |
@@ -549,123 +594,114 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 ### 6.2 Form Inputs
 
 ```
-┌─────────────────────────────────────┐
-│ Label                       [char]  │  Label (--text-body-strong), optional char count
-│ ┌─────────────────────────────────┐ │
-│ │ Placeholder text...            │ │  Input field
-│ └─────────────────────────────────┘ │  │ bg --color-bg-surface, border --color-border
-│ ⚠ This field is required           │  │ --radius-sm, height 40px, padding --space-md
-└─────────────────────────────────────┘  │ focus: border --color-accent, ring --color-border-focus
-                                         │ error: border --color-danger, error text below
-                                         │ disabled: bg --color-bg-surface-alt, text --color-text-disabled
+Label                               12/200
++-----------------------------------+
+| Placeholder text...               |
++-----------------------------------+
+(!) This field is required
 ```
+- Label: `--text-body-strong`, optional char count `--text-small` `--text-secondary` right-aligned
+- Input: bg `--color-bg-surface`, border `--color-border`, `--radius-sm`, height 40px, padding `--space-md`
+- Focus: border `--color-accent`, ring `--color-border-focus`
+- Error: `(!)` marker, border `--color-danger`, error text `--text-small` `--color-danger`
+- Disabled: bg `--color-bg-surface-alt`, text `--color-text-disabled`
 
 **Input types:**
 - `text`, `number`, `date`, `textarea`: standard as above
 - `select` / dropdown: same styling + chevron icon right-aligned
-- `checkbox` / toggle: custom styled, 20x20px box, checked → bg `--color-accent` + checkmark icon (12px, white)
+- `checkbox` / toggle: custom styled, 20x20px box, checked -> bg `--color-accent` + checkmark icon (12px, white)
 - `enum` combobox: searchable dropdown with filter-as-you-type
 
 ### 6.3 Cards
 
 ```
-┌─────────────────────────────────────┐
-│                                     │  bg: --color-bg-surface
-│                                     │  border: 1px --color-border
-│                                     │  --radius-md
-│                                     │  padding: --space-lg
-│       [card content]                │  shadow: --shadow-card
-│                                     │  margin-bottom: --space-lg
-│                                     │
-└─────────────────────────────────────┘
++-----------------------------------+
+|                                   |  bg: --color-bg-surface
+|                                   |  border: 1px --color-border
+|                                   |  --radius-md
+|       [card content]              |  padding: --space-lg
+|                                   |  shadow: --shadow-card
+|                                   |  margin-bottom: --space-lg
++-----------------------------------+
 ```
 
 ### 6.4 Modals (Mobile: Bottom Sheet)
 
-**Mobile bottom sheet:**
 ```
-┌─────────────────────────────────┐
-│  (dimmed backdrop)              │
-│                                 │
-│                                 │
-│ ┌───────────────────────────────┤
-│ │  ────── drag handle ──────    │  Visual grab bar (32px wide, 4px tall, --color-text-disabled, --radius-full)
-│ │                               │
-│ │  Modal Title                  │  --text-h3
-│ │                               │
-│ │  [modal content — scrollable] │
-│ │                               │
-│ │                               │
-│ │  ┌──────────┐ ┌──────────┐   │
-│ │  │  Cancel  │ │  Action  │   │  Fixed footer with buttons
-│ │  └──────────┘ └──────────┘   │
-│ └───────────────────────────────┤
-└─────────────────────────────────┘
+(dimmed backdrop -- tap to dismiss)
+
++-----------------------------------+
+|           ============             |  Drag handle: 32x4px, --color-text-disabled
+|                                    |
+|  Modal Title                       |  --text-h3
+|                                    |
+|  (scrollable modal content)        |
+|                                    |
+|                                    |
+|  +-----------+  +-----------+     |
+|  |  Cancel   |  |  Action   |     |
+|  +-----------+  +-----------+     |
++-----------------------------------+
 ```
 - Slides up from bottom, `--transition-base`
 - Max height: 85vh
-- Rounded top corners: `--radius-lg` top-left + top-right, 0 bottom
+- Rounded top corners: `--radius-lg`, bottom: square
 - Backdrop: `--color-bg-overlay`, tap to dismiss
 
 **Desktop modal (centered dialog):**
+
 ```
-┌──────────────────────────────────────────────┐
-│               (dimmed backdrop)              │
-│                                              │
-│     ┌──────────────────────────────┐        │
-│     │  Modal Title             [×] │        │  Close button top-right
-│     │                              │        │
-│     │  [modal content]             │        │
-│     │                              │        │
-│     │                              │        │
-│     │  ┌──────────┐ ┌──────────┐  │        │
-│     │  │  Cancel  │ │  Action  │  │        │
-│     │  └──────────┘ └──────────┘  │        │
-│     └──────────────────────────────┘        │
-│                                              │
-└──────────────────────────────────────────────┘
+       (dimmed backdrop)
+
+     +---------------------------+
+     |  Modal Title          [X]  |
+     |                            |
+     |  (modal content)           |
+     |                            |
+     |  +--------+  +--------+   |
+     |  | Cancel |  | Action |   |
+     |  +--------+  +--------+   |
+     +---------------------------+
 ```
 - Max-width: 480px, centered vertically and horizontally
 - `--radius-md`, border `--color-border`, shadow `--shadow-modal`
 - Backdrop: `--color-bg-overlay`
-- Close button: Radix Dialog built-in, or custom [×] in header
+- Close button: `[X]` top-right, 36x36px tap target, Ghost variant
 
 ### 6.5 Confirmation Dialogs
 
-Same as modals but smaller (max-width 360px desktop). Contains: icon (🗑 for delete, ⚠ for warning), title, description text, two buttons (Cancel + destructive action).
+Same as modals but smaller (max-width 360px desktop). Contains: icon (trash for delete, warning triangle for warning), title, description text, two buttons (Cancel + destructive action).
 
 ### 6.6 Toast Notifications
 
 ```
-┌──────────────────────────┐
-│ ✓  Moved 3 to Workshop  │  Rounded pill, bg --color-bg-surface, shadow --shadow-dropdown
-└──────────────────────────┘  Positioned top-right (desktop) or top-center (mobile)
-                              Slides in from top, auto-dismiss 4 seconds
++----------------------------+
+| (/)  Moved 3 to Workshop   |
++----------------------------+
 ```
-**Variants:**
-- Success: green checkmark + message, left border `--color-success` 3px
-- Error: red × + message, left border `--color-danger` 3px
-- Warning: amber ! + message, left border `--color-warning` 3px
+- Rounded pill, bg `--color-bg-surface`, shadow `--shadow-dropdown`
+- Slides in from top, auto-dismiss 4 seconds
+- Position: top-right (desktop) or top-center (mobile)
+- `(/)` = green checkmark for success, `(!)` = red x for error, `(i)` = amber warning
+- 3px left border: `--color-success` / `--color-danger` / `--color-warning`
 
 ### 6.7 Empty States
 
 ```
-┌─────────────────────────────────────┐
-│                                     │
-│           ┌─────┐                   │
-│           │ 🗃️  │                   │  Icon/illustration (48px, --color-text-disabled)
-│           └─────┘                   │
-│                                     │
-│      No locations yet               │  Title (--text-body-strong, --color-text-secondary)
-│   Tap + to add your first           │  Description (--text-small, --color-text-secondary)
-│                                     │
-│        ┌──────────────┐             │
-│        │  + Add First  │             │  CTA button (primary variant)
-│        └──────────────┘             │
-│                                     │
-└─────────────────────────────────────┘
++-----------------------------------+
+|                                   |
+|         No locations yet          |
+|   Tap + to add your first         |
+|                                   |
+|        [+ Add First]             |
+|                                   |
++-----------------------------------+
 ```
-Centered in the content area. No decorative illustration — just an icon, text, and CTA. Simple, consistent across all pages.
+- Centered in content area, padding `--space-4xl`
+- No illustration -- just text + CTA
+- Title: `--text-body-strong`, `--color-text-secondary`
+- Description: `--text-small`, `--color-text-secondary`
+- CTA button: Primary variant, centered
 
 ### 6.8 Loading States
 
@@ -678,18 +714,19 @@ Shimmer animation: gradient sweep, `--transition-slow`, looping.
 ### 6.9 Error States
 
 ```
-┌─────────────────────────────────────┐
-│                                     │
-│              ⚠                      │
-│     Something went wrong           │  Title (--text-body-strong, --color-danger)
-│   Could not load locations.        │  Description (--text-small, --color-text-secondary)
-│                                     │
-│          ┌──────────┐              │
-│          │  Retry   │              │  Retry button (secondary variant)
-│          └──────────┘              │
-│                                     │
-└─────────────────────────────────────┘
++-----------------------------------+
+|                                   |
+|        Something went wrong       |
+|   Could not load locations.       |
+|                                   |
+|           [ Retry ]              |
+|                                   |
++-----------------------------------+
 ```
+- Centered in content area, padding `--space-4xl`
+- Title: `--text-body-strong`, `--color-danger`
+- Description: `--text-small`, `--color-text-secondary`
+- Retry button: Secondary variant, centered
 
 ---
 
@@ -697,7 +734,7 @@ Shimmer animation: gradient sweep, `--transition-slow`, looping.
 
 ### 7.1 Tree Expand/Collapse (Locations)
 
-- Parent node shows "▼" (expanded) or "▶" (collapsed) icon, 18x18px, `--color-text-secondary`
+- Parent node shows "[v]" (expanded) or "[>]" (collapsed) icon, 18x18px, `--color-text-secondary`
 - Tap/click icon or entire row to toggle
 - Children indent left by `--space-xl` per depth level
 - Vertical line connecting siblings: 2px `--color-accent-muted`, left edge of child rows
@@ -705,16 +742,16 @@ Shimmer animation: gradient sweep, `--transition-slow`, looping.
 
 ### 7.2 Inline Editing (Tags)
 
-- Edit icon (pencil, 18px, `--color-text-secondary`) → tap activates inline form
+- Edit icon (pencil, 18px, `--color-text-secondary`) -> tap activates inline form
 - Row expands in-place with inputs pre-filled
-- Save → row collapses back to display mode, success flash (brief `--color-accent-muted` bg pulse)
-- Cancel → row collapses, discarding changes
+- Save -> row collapses back to display mode, success flash (brief `--color-accent-muted` bg pulse)
+- Cancel -> row collapses, discarding changes
 - Only one row editable at a time
 
 ### 7.3 Move/Split Dialog (Instances)
 
-- Modal with quantity stepper: `[−] ┌─────┐ [+]` (number input, 56px wide, centered between stepper buttons)
-- Stepper buttons: 36x36px circle, `--color-bg-surface-alt`, icon `--color-text-primary`, hover → `--color-accent-muted`
+- Modal with quantity stepper: `[-] [--x--] [+]` (number input, 56px wide, centered between stepper buttons)
+- Stepper buttons: 36x36px circle, `--color-bg-surface-alt`, icon `--color-text-primary`, hover -> `--color-accent-muted`
 - Quantity slider below: custom range input, track `--color-bg-surface-alt`, filled track `--color-accent`, thumb `--color-accent` 20x20px circle
 - Target selector: segmented control at top — "Location" / "Container" — active segment bg `--color-accent-muted`, text `--color-accent`
 
@@ -724,7 +761,7 @@ Shimmer animation: gradient sweep, `--transition-slow`, looping.
 - Hover (desktop): `--color-accent` text, no underline
 - Active (mobile tap): brief amber background flash
 - Last segment (current): bold, `--color-accent`, not clickable
-- Chevrons/separators between segments: "›" or "/" in `--color-text-disabled`
+- Chevrons/separators between segments: ">" or "/" in `--color-text-disabled`
 
 ---
 
