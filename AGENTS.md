@@ -35,9 +35,9 @@
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Done |
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Done |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Done |
-| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | 🔲 Planned |
-| 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | 🔲 Planned |
-| 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | 🔲 Planned |
+| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Done |
+| 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
+| 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | 🔲 Planned |
 | 9 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
 | 10 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |

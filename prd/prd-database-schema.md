@@ -129,7 +129,7 @@ CREATE TABLE item_definitions (
     id              TEXT PRIMARY KEY,
     name            TEXT NOT NULL,
     description     TEXT,
-    parent_def_id   TEXT REFERENCES item_definitions(id),
+    parent_def_id   TEXT REFERENCES item_definitions(id) ON DELETE RESTRICT,
     unit            TEXT,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -145,9 +145,12 @@ CREATE TABLE definition_fields (
     id              TEXT PRIMARY KEY,
     definition_id   TEXT NOT NULL REFERENCES item_definitions(id) ON DELETE CASCADE,
     field_name      TEXT NOT NULL,
-    field_type      TEXT NOT NULL, -- 'text', 'number', 'boolean', 'date'
+    field_type      TEXT NOT NULL, -- 'text', 'number', 'boolean', 'date', 'enum'
+    enum_values     TEXT,            -- JSON array of strings, required when field_type = 'enum'
     is_required     BOOLEAN NOT NULL DEFAULT 0,
-    display_order   INTEGER NOT NULL DEFAULT 0
+    display_order   INTEGER NOT NULL DEFAULT 0,
+    default_value   TEXT,            -- default value for instances
+    is_child_editable BOOLEAN NOT NULL DEFAULT 0  -- can child definitions override default_value?
 );
 
 CREATE TABLE item_instances (
@@ -161,6 +164,13 @@ CREATE TABLE item_instances (
     CONSTRAINT chk_single_parent CHECK (
         (location_id IS NULL) != (parent_instance_id IS NULL)
     )
+);
+
+CREATE TABLE definition_field_overrides (
+    definition_id   TEXT NOT NULL REFERENCES item_definitions(id) ON DELETE CASCADE,
+    parent_field_id TEXT NOT NULL REFERENCES definition_fields(id) ON DELETE CASCADE,
+    default_value   TEXT,
+    PRIMARY KEY (definition_id, parent_field_id)
 );
 
 CREATE TABLE instance_field_values (
@@ -185,6 +195,7 @@ CREATE TABLE settings (
 -- +goose StatementBegin
 DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS instance_field_values;
+DROP TABLE IF EXISTS definition_field_overrides;
 DROP TABLE IF EXISTS item_instances;
 DROP TABLE IF EXISTS definition_fields;
 DROP TABLE IF EXISTS item_definitions;
@@ -203,7 +214,7 @@ Since SQLite lacks native UUID v4, Go must generate the IDs using `github.com/go
 
 | Failure Mode | System Behavior |
 |---|---|
-| User attempts to delete a Tag with linked definitions | Rejected by DB (`FOREIGN KEY` violation). Go returns HTTP 409 Conflict. |
+| User attempts to delete a Tag with linked definitions | Service checks `definition_tags` count and returns a warning with the number of linked definitions. User confirms → tag deleted and associations cascade via `ON DELETE CASCADE`. |
 | User attempts to delete a Location with items | Rejected by DB (`ON DELETE RESTRICT`). Go returns HTTP 409 Conflict. |
 | Database file is unwriteable due to NAS permissions | Application fails to start, logging a fatal error before the HTTP server binds. |
 | Migration fails midway | Goose rollback will trigger (`-- +goose Down`). If irrecoverable, app exits. |

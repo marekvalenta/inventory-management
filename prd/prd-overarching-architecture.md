@@ -145,7 +145,7 @@ Four primary entity types:
 - **Definition inheritance** — a child definition inherits the field schema from its parent and may add new fields.
 - **Smart quantity merging** — identical items (same definition, same field values, same parent) share one instance record with a merged `quantity`. When any field value diverges, they become separate instances. Partial move/split logic is defined in `prd-item-instances.md`.
 - **Tags** — flexible many-to-many labeling of item definitions (e.g. "Fasteners", "Fragile"). Defined in `prd-tags.md`.
-- **Deletion guards** — locations with children and tags used by definitions cannot be deleted. The database layer enforces this via foreign key constraints, and services surface it as HTTP 409.
+- **Deletion guards** — locations with children cannot be deleted (hard block, FK `ON DELETE RESTRICT`, HTTP 409). Tags used by definitions can be deleted with user confirmation; associated definition_tags rows cascade via `ON DELETE CASCADE` — the user is warned how many definitions will be affected before proceeding.
 
 ### 4.3 Entity Relationship Summary
 
@@ -318,8 +318,8 @@ Even though the above are non-goals for v1, the architecture must not block them
 | # | Question | Status |
 |---|---|---|
 | OQ-1 | Conflict resolution if NAS volume is simultaneously accessed by two container instances | Deferred — single instance assumed in v1 |
-| OQ-2 | Should tags have descriptions in addition to colors? | Deferred to tags feature PRD |
-| OQ-3 | Exact field types supported (e.g. enum dropdowns, date pickers)? | Deferred to Item Definition feature PRD |
+| OQ-2 | Should tags have descriptions in addition to colors? | Resolved — Tags use name + color (hex) only. No description field. |
+| OQ-3 | Exact field types supported (e.g. enum dropdowns, date pickers)? | Resolved — v1 supports text, number, boolean, date, enum. See `prd-item-definitions.md`. |
 | OQ-4 | Should instances support instance-specific tags? | Deferred. For now, tags only apply to definitions. |
 | OQ-5 | Maximum supported tree depth before performance degrades on NAS hardware? | Validate with benchmark |
 
