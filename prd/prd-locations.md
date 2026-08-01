@@ -18,9 +18,9 @@
 
 | # | Conflict | PRDs Involved | Resolution |
 |---|---|---|---|
-| 1 | Overarching §4.2 describes a "Delete all?" prompt implying cascade, but `prd-database-schema.md` enforces `ON DELETE RESTRICT`. | prd-overarching-architecture.md, prd-database-schema.md | This PRD adopts **hard block (RESTRICT)**. No cascade delete. UI shows error with counts of blocking children/items. Overarching PRD v2 already updated. |
+| 1 | Overarching §4.2 describes a "Delete all?" prompt implying cascade, but `prd-database-schema.md` enforces `ON DELETE RESTRICT`. | prd-overarching-architecture.md, prd-database-schema.md | This PRD adopts **hard block (RESTRICT)**. No cascade delete. UI shows error with counts of blocking children/items. Overarching PRD updated to reflect RESTRICT enforcement. |
 | 2 | Root location behavior undefined — database PRD auto-seeds it but doesn't specify mutability rules. | prd-database-schema.md | Root location is **special**: cannot be deleted or reparented, but **can be renamed**. Root is identified via `settings.root_location_id`. |
-| - | `root_location_id` was not in the initial database PRD schema. | prd-database-schema.md | **Resolved:** `root_location_id TEXT REFERENCES locations(id)` has been added to the `settings` table in `prd-database-schema.md`'s initial migration. No separate migration needed. |
+| - | `root_location_id` was not in the initial database PRD schema. | prd-database-schema.md | **Resolved:** `root_location_id TEXT REFERENCES locations(id)` is included in the initial migration defined in `prd-database-schema.md`. No additional change needed. |
 
 ### Confirmed Alignments
 - Data model: Uses `locations` table exactly as defined in `prd-database-schema.md` TR-3.

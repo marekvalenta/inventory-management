@@ -307,7 +307,7 @@ Even though the above are non-goals for v1, the architecture must not block them
 | Photo attachments | `/data/images/` volume path reserved; schema designed for clean `image_path` migration |
 | Barcode scanning | Item definition has a nullable `barcode` field slot available (unused in v1) |
 | Bulk import | Import service will reuse the same move/upsert logic |
-| Multi-user | Auth middleware slot in Go router already stubbed (passthrough in v1) |
+| Multi-user | Auth middleware slot planned in Go router (passthrough stub in v1) |
 | Full-text search | SQLite FTS5 extension can be added without breaking the REST API contract |
 | External API access | `/api/v1/` versioned from day one |
 

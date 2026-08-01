@@ -222,5 +222,5 @@ Since SQLite lacks native UUID v4, Go must generate the IDs using `github.com/go
 
 | # | Question | Status |
 |---|---|---|
-| OQ-1 | Should we index `name` columns for faster substring search? | Deferred to Search PRD. We will add a new migration for indexes later. |
+| OQ-1 | Should we index `name` columns for faster substring search? | Deferred to Search PRD. If indexes are needed, they will be part of the initial schema, not a separate migration. |
 | OQ-2 | Are there specific constraints needed for `parent_instance_id` to prevent infinite loops? | A database `CHECK` constraint can't easily prevent recursive loops. This must be handled by Go application logic in the Instance Move service. |
