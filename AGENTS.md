@@ -38,7 +38,7 @@
 | 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Done |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
-| 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | 🔲 Planned |
+| 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
 | 9 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
 | 10 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
 | 11 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |

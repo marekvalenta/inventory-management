@@ -149,12 +149,14 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 - [ ] **[UI]** Verified in browser on both 375px and 1920px viewports.
 
 ### US-008: Create/Edit Location Form (UI)
-**Description:** As a user, I want a clean form to add or edit locations with validation feedback.
+**Description:** As a user, I want to add a sub-location inside the location I'm currently viewing, or edit an existing location. **Creating a location is contextual — you are always placing it inside another location (except the root, see below).**
 
 **Acceptance Criteria:**
+- [ ] **"Add Sub-Location" button is ONLY available on the Location Detail page.** It creates a location with the current location pre-selected as parent. There is NO standalone "Create Location" page/route and NO create-location button on any instance page.
+- [ ] **Root-level location creation:** creating a location with no parent (top-level) has no obvious UI entry point yet since the user is always "inside" a location context. This is an open question — deferred to implementation. The `parent_id` can be set to `null` via the API, but the UI flow for root-level creation is not designed in v1.
 - [ ] Form opens as a modal (mobile: bottom sheet; desktop: centered dialog via Radix Dialog).
-- [ ] Fields: Name (required, text input), Description (optional, textarea), Parent Location (optional, dropdown).
-- [ ] Parent dropdown excludes the location itself and all its descendants to prevent cycles (mirrors server validation).
+- [ ] Fields: Name (required, text input), Description (optional, textarea), Parent Location (pre-filled from context, read-only).
+- [ ] When editing: parent dropdown is visible and editable (for reparenting). The dropdown excludes the location itself and all its descendants to prevent cycles (mirrors server validation).
 - [ ] Inline validation errors appear under each field on blur/submit.
 - [ ] Successful save closes the modal and invalidates the `['locations']` TanStack Query cache.
 - [ ] For edit: form is pre-populated with current values.
@@ -318,6 +320,8 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 - **Bulk operations:** No multi-select, batch delete, or batch move.
 - **Drag-and-drop reordering/reparenting:** v1 uses form-based parent selection only.
 - **Location-level tags:** Tags apply to item definitions only (per overarching PRD).
+- **Standalone "Create Location" page or global button:** Location creation is always contextual — initiated from a Location Detail page with the parent pre-filled. No `/locations/new` route exists.
+- **Creating locations from instance pages:** Locations are created within locations only, never within items.
 - **Item instance details in tree:** Tree shows locations only, not items within them. Instance browsing happens in the Location Detail view.
 - **Search within location tree:** Deferred to PRD #10 (Search).
 - **Location images/photos:** Deferred to future photo attachment feature.
@@ -333,3 +337,4 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 | OQ-2 | Should moving a location also move its item instances (current behavior) or leave them orphaned? | Resolved — moving a location does NOT affect item instances (they stay at this location); changing `parent_id` only affects the location's position in the tree. Item instances are bound to the location by `location_id`, not by tree position. |
 | OQ-3 | Should location names be unique within a parent? | Deferred — v1 allows duplicates. Revisit if user feedback demands it. |
 | OQ-4 | Pagination for contents endpoint when > 500 instances? | Deferred — v1 returns all with a hard cap. Add cursor pagination in v2. |
+| OQ-5 | How should the user create a root-level location (no parent)? The UI is always contextual — the user is inside a location, so creating a sub-location is natural, but creating a sibling root is not. | Open — the API supports `parent_id = null` but there is no v1 UI entry point for it. Possible solutions: a "Create Top-Level Location" option in the location tree empty area, or a button on the root location's detail page. Deferred to implementation. |

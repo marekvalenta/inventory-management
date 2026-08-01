@@ -131,6 +131,7 @@ CREATE TABLE item_definitions (
     description     TEXT,
     parent_def_id   TEXT REFERENCES item_definitions(id) ON DELETE RESTRICT,
     unit            TEXT,
+    is_container    BOOLEAN NOT NULL DEFAULT 0,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -158,7 +159,7 @@ CREATE TABLE item_instances (
     definition_id       TEXT NOT NULL REFERENCES item_definitions(id) ON DELETE RESTRICT,
     quantity            INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
     location_id         TEXT REFERENCES locations(id),
-    parent_instance_id  TEXT REFERENCES item_instances(id),
+    parent_instance_id  TEXT REFERENCES item_instances(id) ON DELETE RESTRICT,
     created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_single_parent CHECK (

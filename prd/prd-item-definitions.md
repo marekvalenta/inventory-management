@@ -79,11 +79,12 @@ Item Definitions are the "class" layer of the inventory system. They define *wha
 **Description:** As a user, I want to create a new item definition with custom fields and tags so I can define what properties my items have.
 
 **Acceptance Criteria:**
-- [ ] `POST /api/v1/definitions` with `{ "name", "description?", "parent_def_id?", "unit?", "fields": [...], "tag_ids": [...] }` creates a definition.
+- [ ] `POST /api/v1/definitions` with `{ "name", "description?", "parent_def_id?", "unit?", "is_container?", "fields": [...], "tag_ids": [...] }` creates a definition.
 - [ ] `name`: required, 2–200 chars, globally unique.
 - [ ] `description`: optional, max 2000 chars.
 - [ ] `parent_def_id`: optional. If provided, must reference an existing definition. No cycle check needed for root-creation (parent must exist).
 - [ ] `unit`: optional, free text, max 20 chars (e.g. `"pcs"`, `"kg"`, `"m"`).
+- [ ] `is_container`: optional boolean (default `false`). If `true`, instances of this definition can contain other instances (item-in-item nesting).
 - [ ] `fields`: array of field objects (see US-006 for field shape). At least 1 field recommended but not required.
 - [ ] `tag_ids`: array of existing tag UUIDs.
 - [ ] Returns `201 Created` with the full definition including resolved fields, tags, and `instances_summary: { total_instances: 0, total_quantity: 0, by_location: [] }`.
@@ -119,7 +120,7 @@ Item Definitions are the "class" layer of the inventory system. They define *wha
 **Description:** As a user, I want to edit a definition's metadata, fields, and tags.
 
 **Acceptance Criteria:**
-- [ ] `PUT /api/v1/definitions/:id` updates `name`, `description`, `parent_def_id`, `unit`, `fields`, and/or `tag_ids`.
+- [ ] `PUT /api/v1/definitions/:id` updates `name`, `description`, `parent_def_id`, `unit`, `is_container`, `fields`, and/or `tag_ids`.
 - [ ] Partial updates allowed — only send changed properties.
 - [ ] If `parent_def_id` is changed: cycle detection must verify the new parent is not a descendant of this definition.
 - [ ] Renaming to an already-used name returns `409 Conflict`.
@@ -281,8 +282,8 @@ All endpoints under `/api/v1/definitions`.
 |--------|------|-------------|--------------|----------|
 | `GET` | `/definitions` | List all definitions | — | `DefinitionSummary[]` |
 | `GET` | `/definitions/:id` | Single definition (resolved) | — | `DefinitionDetail` |
-| `POST` | `/definitions` | Create definition | `{ name, description?, parent_def_id?, unit?, fields?, tag_ids? }` | `DefinitionDetail` (201) |
-| `PUT` | `/definitions/:id` | Update definition | `{ name?, description?, parent_def_id?, unit?, fields?, tag_ids? }` | `DefinitionDetail` |
+| `POST` | `/definitions` | Create definition | `{ name, description?, parent_def_id?, unit?, is_container?, fields?, tag_ids? }` | `DefinitionDetail` (201) |
+| `PUT` | `/definitions/:id` | Update definition | `{ name?, description?, parent_def_id?, unit?, is_container?, fields?, tag_ids? }` | `DefinitionDetail` |
 | `DELETE` | `/definitions/:id` | Delete (guarded) | — | 204 or 409 |
 | `PUT` | `/definitions/:id/overrides` | Update field overrides | `{ overrides: [{ parent_field_id, default_value }] }` | `{ overrides: [...] }` |
 
@@ -295,6 +296,7 @@ All endpoints under `/api/v1/definitions`.
   "parent_def_id": "uuid or null",
   "parent_def_name": "Fastener or null",
   "unit": "pcs",
+  "is_container": false,
   "total_instances": 42,
   "tags": [
     { "id": "uuid", "name": "Fasteners", "color": "#FF5733" }
@@ -313,6 +315,7 @@ All endpoints under `/api/v1/definitions`.
   "parent_def_id": "uuid or null",
   "parent_def_name": "Fastener or null",
   "unit": "pcs",
+  "is_container": false,
   "created_at": "...",
   "updated_at": "...",
   "fields": [
@@ -340,6 +343,16 @@ All endpoints under `/api/v1/definitions`.
         "location_name": "Workshop",
         "instance_count": 3,
         "total_quantity": 85
+      }
+    ],
+    "by_parent_instance": [
+      {
+        "parent_instance_id": "uuid",
+        "parent_instance_name": "Toolbox #3",
+        "location_id": "uuid",
+        "location_name": "Workshop",
+        "instance_count": 4,
+        "total_quantity": 20
       }
     ]
   },

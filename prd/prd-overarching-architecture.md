@@ -143,9 +143,11 @@ Four primary entity types:
 
 - **Locations are definitions only** — a Room is just a Room. No "instances" of a location exist.
 - **Definition inheritance** — a child definition inherits the field schema from its parent and may add new fields.
-- **Smart quantity merging** — identical items (same definition, same field values, same parent) share one instance record with a merged `quantity`. When any field value diverges, they become separate instances. Partial move/split logic is defined in `prd-item-instances.md`.
+- **Smart quantity merging** — identical items (same definition, same field values, same parent) share one instance record with a merged `quantity`. When any field value diverges, they become separate instances.
+- **Container nesting** — definitions can be marked `is_container`, allowing their instances to contain other instances (item-in-item). Only container instances can act as parents.
+- **Move/split** — instances can be partially moved with transaction safety, auto-merging at target. Full logic in `prd-item-instances.md`.
 - **Tags** — flexible many-to-many labeling of item definitions (e.g. "Fasteners", "Fragile"). Defined in `prd-tags.md`.
-- **Deletion guards** — locations with children cannot be deleted (hard block, FK `ON DELETE RESTRICT`, HTTP 409). Tags used by definitions can be deleted with user confirmation; associated definition_tags rows cascade via `ON DELETE CASCADE` — the user is warned how many definitions will be affected before proceeding.
+- **Deletion guards** — locations, definitions, and container-like instances with children cannot be deleted (hard block, FK `ON DELETE RESTRICT`, HTTP 409). Tags used by definitions can be deleted with user confirmation; associated definition_tags rows cascade via `ON DELETE CASCADE` — the user is warned how many definitions will be affected before proceeding.
 
 ### 4.3 Entity Relationship Summary
 
@@ -336,10 +338,10 @@ Even though the above are non-goals for v1, the architecture must not block them
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Done |
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Done |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Done |
-| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | 🔲 Planned |
-| 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | 🔲 Planned |
-| 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | 🔲 Planned |
-| 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | 🔲 Planned |
+| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Done |
+| 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
+| 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
+| 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
 | 9 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |
 | 10 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
 | 11 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
