@@ -31,10 +31,15 @@ type Contents struct {
 }
 
 type InstanceSummary struct {
-	ID             string `json:"id"`
-	DefinitionID   string `json:"definition_id"`
-	DefinitionName string `json:"definition_name"`
-	Quantity       int    `json:"quantity"`
+	ID                 string  `json:"id"`
+	DefinitionID       string  `json:"definition_id"`
+	DefinitionName     string  `json:"definition_name"`
+	Quantity           int     `json:"quantity"`
+	LocationID         *string `json:"location_id"`
+	LocationName       *string `json:"location_name"`
+	ParentInstanceID   *string `json:"parent_instance_id"`
+	ParentInstanceName *string `json:"parent_instance_name"`
+	UpdatedAt          string  `json:"updated_at"`
 }
 
 type BreadcrumbNode struct {

@@ -1,0 +1,217 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-bg-overlay);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog {
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  width: 90vw;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: var(--space-2xl);
+}
+
+.title {
+  font: var(--text-h2);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-lg) 0;
+}
+
+.fieldGroup {
+  margin-bottom: var(--space-lg);
+}
+
+.label {
+  display: block;
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.required {
+  color: var(--color-danger);
+  margin-left: 2px;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font: var(--text-body);
+  outline: none;
+  min-height: 44px;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  border-color: var(--color-border-focus);
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--color-accent);
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--text-body);
+  color: var(--color-text-primary);
+  min-height: 44px;
+}
+
+.select {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font: var(--text-body);
+  outline: none;
+  min-height: 44px;
+}
+
+.select:focus {
+  border-color: var(--color-border-focus);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.cancelButton {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color var(--transition-fast);
+}
+
+.cancelButton:hover {
+  background-color: var(--color-bg-surface-alt);
+}
+
+.saveButton {
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color var(--transition-fast);
+}
+
+.saveButton:hover {
+  background: var(--color-accent-hover);
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorText {
+  font: var(--text-small);
+  color: var(--color-danger);
+  margin-top: var(--space-xs);
+}
+
+.contextInfo {
+  font: var(--text-small);
+  color: var(--color-text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-bg-base);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.searchResults {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: var(--space-xs);
+}
+
+.searchItem {
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  font: var(--text-body);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.searchItem:hover {
+  background: var(--color-bg-surface-alt);
+}
+
+.moveModeToggle {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.moveModeButton {
+  flex: 1;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: all var(--transition-fast);
+}
+
+.moveModeButton:hover {
+  background: var(--color-bg-surface-alt);
+}
+
+.moveModeButtonActive {
+  composes: moveModeButton;
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.confirmationText {
+  font: var(--text-body);
+  color: var(--color-text-primary);
+  margin: var(--space-lg) 0;
+  line-height: 1.5;
+}
+
+.warningText {
+  font: var(--text-body);
+  color: var(--color-warning);
+  margin: var(--space-lg) 0;
+  padding: var(--space-md);
+  background: rgba(212, 149, 51, 0.1);
+  border-radius: var(--radius-sm);
+}

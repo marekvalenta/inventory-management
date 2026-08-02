@@ -35,12 +35,15 @@ func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 	tagHandler := handler.NewTagHandler(tagSvc)
 	definitionSvc := service.NewDefinitionService(db)
 	definitionHandler := handler.NewDefinitionHandler(definitionSvc)
+	instanceSvc := service.NewInstanceService(db)
+	instanceHandler := handler.NewInstanceHandler(instanceSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
 		locationHandler.RegisterRoutes(r)
 		tagHandler.RegisterRoutes(r)
 		definitionHandler.RegisterRoutes(r)
+		instanceHandler.RegisterRoutes(r)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -70,12 +73,15 @@ func NewTestRouter(db *sql.DB) chi.Router {
 	tagHandler := handler.NewTagHandler(tagSvc)
 	definitionSvc := service.NewDefinitionService(db)
 	definitionHandler := handler.NewDefinitionHandler(definitionSvc)
+	instanceSvc := service.NewInstanceService(db)
+	instanceHandler := handler.NewInstanceHandler(instanceSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
 		locationHandler.RegisterRoutes(r)
 		tagHandler.RegisterRoutes(r)
 		definitionHandler.RegisterRoutes(r)
+		instanceHandler.RegisterRoutes(r)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {

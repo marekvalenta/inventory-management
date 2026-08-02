@@ -23,6 +23,9 @@ import { Breadcrumb } from '../components/breadcrumb/Breadcrumb'
 import { LocationTree } from '../components/locations/LocationTree'
 import { CreateEditModal } from '../components/locations/CreateEditModal'
 import { DeleteDialog } from '../components/locations/DeleteDialog'
+import { CreateInstanceModal } from '../components/instances/CreateInstanceModal'
+import { createInstance } from '../api/instances'
+import type { CreateInstanceRequest } from '../api/instances'
 import { ApiError } from '../api/client'
 import { useToast } from '../context/ToastContext'
 import styles from './LocationDetailPage.module.css'
@@ -36,6 +39,7 @@ export function LocationDetailPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [createInstanceOpen, setCreateInstanceOpen] = useState(false)
 
   const {
     data: location,
@@ -110,6 +114,19 @@ export function LocationDetailPage() {
       } else {
         addToast('Failed to delete location', 'error')
       }
+    },
+  })
+
+  const createInstanceMutation = useMutation({
+    mutationFn: (data: CreateInstanceRequest) => createInstance(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['locations'] })
+      queryClient.invalidateQueries({ queryKey: ['instances'] })
+      setCreateInstanceOpen(false)
+      addToast('Item added', 'success')
+    },
+    onError: (err: Error) => {
+      addToast(err.message || 'Failed to add item', 'error')
     },
   })
 
@@ -190,10 +207,20 @@ export function LocationDetailPage() {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>
-          <CubeIcon width={20} height={20} />
-          Items
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--space-md)', paddingBottom: 'var(--space-sm)', borderBottom: '1px solid var(--color-border)' }}>
+          <h2 className={styles.sectionTitle} style={{ margin: 0, padding: 0, border: 'none' }}>
+            <CubeIcon width={20} height={20} />
+            Items
+          </h2>
+          <button
+            className={styles.actionButton}
+            onClick={() => setCreateInstanceOpen(true)}
+            title="Add item"
+          >
+            <PlusIcon width={20} height={20} />
+            Add Item
+          </button>
+        </div>
         {contentsLoading ? (
           <div className={styles.loading}>Loading...</div>
         ) : contents?.instances && contents.instances.length > 0 ? (
@@ -245,6 +272,13 @@ export function LocationDetailPage() {
         onOpenChange={setDeleteDialogOpen}
         locationName={location.name}
         onConfirm={() => deleteMutation.mutate()}
+      />
+
+      <CreateInstanceModal
+        open={createInstanceOpen}
+        onOpenChange={setCreateInstanceOpen}
+        locationId={id ?? null}
+        onSave={(data) => createInstanceMutation.mutate(data)}
       />
     </div>
   )

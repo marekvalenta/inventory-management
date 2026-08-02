@@ -863,12 +863,10 @@ func (s *DefinitionService) getInstanceSummary(defID string) (InstanceSummaryDet
 	}
 
 	parentRows, err := s.db.Query(`
-		SELECT i.parent_instance_id, 'inside', l.id, l.name, COUNT(*), COALESCE(SUM(i.quantity), 0)
+		SELECT i.parent_instance_id, COUNT(*), COALESCE(SUM(i.quantity), 0)
 		FROM item_instances i
-		JOIN locations l ON l.id = i.location_id
 		WHERE i.definition_id = ? AND i.parent_instance_id IS NOT NULL
-		GROUP BY i.parent_instance_id, i.location_id
-		ORDER BY l.name ASC
+		GROUP BY i.parent_instance_id
 	`, defID)
 	if err != nil {
 		return summaries, fmt.Errorf("get instance by parent: %w", err)
@@ -877,11 +875,22 @@ func (s *DefinitionService) getInstanceSummary(defID string) (InstanceSummaryDet
 
 	for parentRows.Next() {
 		var pic ParentInstanceCount
-		var parentInstName string
-		if err := parentRows.Scan(&pic.ParentInstanceID, &parentInstName, &pic.LocationID, &pic.LocationName, &pic.InstanceCount, &pic.TotalQuantity); err != nil {
+		if err := parentRows.Scan(&pic.ParentInstanceID, &pic.InstanceCount, &pic.TotalQuantity); err != nil {
 			return summaries, fmt.Errorf("scan parent instance count: %w", err)
 		}
-		pic.ParentInstanceName = parentInstName
+
+		var parentDefName string
+		s.db.QueryRow(`
+			SELECT d.name FROM item_definitions d
+			JOIN item_instances pi ON pi.definition_id = d.id
+			WHERE pi.id = ?
+		`, pic.ParentInstanceID).Scan(&parentDefName)
+		pic.ParentInstanceName = parentDefName
+
+		locID, locName := s.resolveLocationForInstance(pic.ParentInstanceID)
+		pic.LocationID = locID
+		pic.LocationName = locName
+
 		summaries.ByParentInstance = append(summaries.ByParentInstance, pic)
 	}
 
@@ -972,6 +981,31 @@ func validateFieldDefaultValue(fieldType string, value *string, enumRaw sql.Null
 		}
 	}
 	return nil
+}
+
+func (s *DefinitionService) resolveLocationForInstance(instanceID string) (string, string) {
+	currentID := instanceID
+	for i := 0; i < 50; i++ {
+		var locationID, locationName sql.NullString
+		var parentInstanceID sql.NullString
+		err := s.db.QueryRow(`
+			SELECT i.location_id, l.name, i.parent_instance_id
+			FROM item_instances i
+			LEFT JOIN locations l ON l.id = i.location_id
+			WHERE i.id = ?
+		`, currentID).Scan(&locationID, &locationName, &parentInstanceID)
+		if err != nil {
+			return "", ""
+		}
+		if locationID.Valid {
+			return locationID.String, locationName.String
+		}
+		if !parentInstanceID.Valid {
+			return "", ""
+		}
+		currentID = parentInstanceID.String
+	}
+	return "", ""
 }
 
 func (s *DefinitionService) checkFieldNameCollisionWithInherited(defID string, newFieldNames []string) error {

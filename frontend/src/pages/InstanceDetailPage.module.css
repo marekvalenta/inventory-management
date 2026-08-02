@@ -1,0 +1,272 @@
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+}
+
+.loading {
+  padding: var(--space-3xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+}
+
+.error {
+  padding: var(--space-3xl);
+  text-align: center;
+  color: var(--color-danger);
+  font: var(--text-body);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-2xl);
+  gap: var(--space-lg);
+  padding-top: var(--space-md);
+}
+
+.headerInfo {
+  flex: 1;
+}
+
+.heading {
+  font: var(--text-h1);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.definitionLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  font: var(--text-body);
+  color: var(--color-accent);
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.definitionLink:hover {
+  color: var(--color-accent-hover);
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.quantityBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font: var(--text-body-strong);
+}
+
+.unitBadge {
+  color: var(--color-text-secondary);
+  font: var(--text-small);
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.actionButton:hover {
+  background-color: var(--color-bg-surface-alt);
+  border-color: var(--color-text-secondary);
+}
+
+.deleteButton {
+  composes: actionButton;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.deleteButton:hover {
+  background-color: rgba(194, 84, 61, 0.1);
+}
+
+.section {
+  margin-bottom: var(--space-3xl);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--text-h3);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-md) 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.placementInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--text-body);
+  color: var(--color-text-secondary);
+  min-height: 44px;
+}
+
+.placementLink {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.placementLink:hover {
+  color: var(--color-accent-hover);
+}
+
+.fieldTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fieldRow {
+  display: flex;
+  align-items: center;
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 44px;
+  gap: var(--space-lg);
+}
+
+.fieldRow:last-child {
+  border-bottom: none;
+}
+
+.fieldName {
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.fieldType {
+  font: var(--text-caption);
+  color: var(--color-text-disabled);
+  text-transform: uppercase;
+}
+
+.fieldValue {
+  font: var(--text-body);
+  color: var(--color-text-primary);
+  word-break: break-word;
+}
+
+.fieldValueEmpty {
+  composes: fieldValue;
+  color: var(--color-text-disabled);
+  font-style: italic;
+}
+
+.fieldRequired {
+  color: var(--color-danger);
+  margin-left: 2px;
+}
+
+.contentsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.contentsEmpty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font: var(--text-small);
+}
+
+.contentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  min-height: 44px;
+  transition: background-color var(--transition-fast);
+}
+
+.contentItem:hover {
+  background-color: var(--color-bg-surface-alt);
+}
+
+.contentName {
+  font: var(--text-body-strong);
+}
+
+.contentQuantity {
+  font: var(--text-small);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-base);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+}
+
+.footer {
+  padding-top: var(--space-2xl);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: var(--space-lg);
+  font: var(--text-caption);
+  color: var(--color-text-disabled);
+}
+
+@media (max-width: 639px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .headerActions {
+    width: 100%;
+  }
+
+  .actionButton,
+  .deleteButton {
+    flex: 1;
+    justify-content: center;
+    padding: var(--space-sm);
+  }
+
+  .fieldRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
+
+  .fieldName {
+    min-width: auto;
+  }
+}

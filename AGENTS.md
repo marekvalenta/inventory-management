@@ -39,7 +39,7 @@
 | 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Implemented |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Implemented |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Implemented |
-| 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
+| 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Implemented |
 | 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | ✅ Done |
 | 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |
 | 11 | `prd-dashboard.md` | Dashboard — totals, recent activity, quick search bar | 🔲 Planned |

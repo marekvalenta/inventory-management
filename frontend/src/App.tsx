@@ -9,6 +9,7 @@ import { LocationsPage } from './pages/LocationsPage'
 import { LocationDetailPage } from './pages/LocationDetailPage'
 import { DefinitionListPage } from './pages/DefinitionListPage'
 import { DefinitionDetailPage } from './pages/DefinitionDetailPage'
+import { InstanceDetailPage } from './pages/InstanceDetailPage'
 import { TagsPage } from './pages/TagsPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -30,7 +31,7 @@ function App() {
                 <Route path="locations/:id" element={<LocationDetailPage />} />
                 <Route path="definitions" element={<DefinitionListPage />} />
                 <Route path="definitions/:id" element={<DefinitionDetailPage />} />
-                <Route path="instances/:id" element={<HomePage />} />
+                <Route path="instances/:id" element={<InstanceDetailPage />} />
                 <Route path="tags" element={<TagsPage />} />
                 <Route path="settings" element={<HomePage />} />
                 <Route path="*" element={<NotFoundPage />} />
