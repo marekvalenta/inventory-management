@@ -5,6 +5,8 @@ import { OnlineStatusProvider } from './context/OnlineStatusContext'
 import { OfflineBanner } from './components/common/OfflineBanner'
 import { ToastContainer } from './components/common/Toast'
 import { AppLayout } from './components/layout/AppLayout'
+import { LocationsPage } from './pages/LocationsPage'
+import { LocationDetailPage } from './pages/LocationDetailPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -21,8 +23,8 @@ function App() {
             <Routes>
               <Route element={<AppLayout />}>
                 <Route index element={<Navigate to="/locations" replace />} />
-                <Route path="locations" element={<HomePage />} />
-                <Route path="locations/:id" element={<HomePage />} />
+                <Route path="locations" element={<LocationsPage />} />
+                <Route path="locations/:id" element={<LocationDetailPage />} />
                 <Route path="definitions" element={<HomePage />} />
                 <Route path="definitions/:id" element={<HomePage />} />
                 <Route path="instances/:id" element={<HomePage />} />

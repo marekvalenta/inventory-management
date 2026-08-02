@@ -1,0 +1,147 @@
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  gap: var(--space-lg);
+}
+
+.heading {
+  font: var(--text-h1);
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.description {
+  font: var(--text-body);
+  color: var(--color-text-secondary);
+  margin: var(--space-sm) 0 0 0;
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-shrink: 0;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.actionButton:hover {
+  background-color: var(--color-bg-surface-alt);
+  border-color: var(--color-text-secondary);
+}
+
+.deleteButton {
+  composes: actionButton;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.deleteButton:hover {
+  background-color: rgba(194, 84, 61, 0.1);
+}
+
+.section {
+  margin-bottom: var(--space-3xl);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--text-h3);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-md) 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.loading {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+}
+
+.error {
+  padding: var(--space-3xl);
+  text-align: center;
+  color: var(--color-danger);
+  font: var(--text-body);
+}
+
+.empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font: var(--text-small);
+}
+
+.instanceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.instanceItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text-primary);
+  min-height: 44px;
+  transition: background-color var(--transition-fast);
+}
+
+.instanceItem:hover {
+  background-color: var(--color-bg-surface-alt);
+}
+
+.instanceName {
+  font: var(--text-body-strong);
+}
+
+.instanceQuantity {
+  font: var(--text-small);
+  color: var(--color-text-secondary);
+  background: var(--color-bg-base);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+}
+
+@media (max-width: 639px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .buttonLabel {
+    display: none;
+  }
+
+  .actionButton,
+  .deleteButton {
+    padding: var(--space-sm);
+  }
+}

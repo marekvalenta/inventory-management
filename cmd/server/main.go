@@ -22,7 +22,7 @@ func main() {
 	db.RunMigrations(database)
 	db.AutoSeed(database)
 
-	r := router.New(embeddedFrontend)
+	r := router.New(embeddedFrontend, database)
 
 	log.Printf("inventory-management server starting on :%s", cfg.Port)
 	if err := http.ListenAndServe(":"+cfg.Port, r); err != nil {

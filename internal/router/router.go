@@ -1,6 +1,7 @@
 package router
 
 import (
+	"database/sql"
 	"io/fs"
 	"log"
 	"net/http"
@@ -10,9 +11,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/marekvalenta/inventory-management/internal/handler"
+	"github.com/marekvalenta/inventory-management/internal/service"
 )
 
-func New(embeddedFrontend fs.FS) chi.Router {
+func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 	distFS, err := fs.Sub(embeddedFrontend, "static")
 	if err != nil {
 		log.Printf("embedded static directory not found: %v", err)
@@ -27,8 +29,12 @@ func New(embeddedFrontend fs.FS) chi.Router {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(30 * time.Second))
 
+	locationSvc := service.NewLocationService(db)
+	locationHandler := handler.NewLocationHandler(locationSvc)
+
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
+		locationHandler.RegisterRoutes(r)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +45,31 @@ func New(embeddedFrontend fs.FS) chi.Router {
 			return
 		}
 		serveSPA(w, r, distFS)
+	})
+
+	return r
+}
+
+func NewTestRouter(db *sql.DB) chi.Router {
+	r := chi.NewRouter()
+
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(middleware.Timeout(30 * time.Second))
+
+	locationSvc := service.NewLocationService(db)
+	locationHandler := handler.NewLocationHandler(locationSvc)
+
+	r.Route("/api/v1", func(r chi.Router) {
+		r.Get("/health", handler.HealthHandler())
+		locationHandler.RegisterRoutes(r)
+	})
+
+	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte(`{"error":"not found","code":"not_found"}`))
 	})
 
 	return r

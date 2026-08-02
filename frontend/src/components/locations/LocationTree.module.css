@@ -1,0 +1,96 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+}
+
+.node {
+  display: flex;
+  flex-direction: column;
+}
+
+.nodeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.nodeRow:hover {
+  background-color: var(--color-bg-surface);
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.expandButton:hover {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-alt);
+}
+
+.name {
+  flex: 1;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font: var(--text-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: var(--space-xs);
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.name:hover {
+  color: var(--color-accent);
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-disabled);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.addButton:hover {
+  color: var(--color-accent);
+  background-color: var(--color-accent-muted);
+}
+
+.loading {
+  padding-left: 48px;
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+  font: var(--text-small);
+  color: var(--color-text-secondary);
+}
+
+.empty {
+  padding: var(--space-3xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+}
