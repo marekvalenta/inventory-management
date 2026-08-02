@@ -1,0 +1,25 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-tag-bg);
+  border-radius: var(--radius-full);
+}
+
+.badgeMd {
+  padding: var(--space-sm) var(--space-md);
+  font: var(--text-body-strong);
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.name {
+  font: var(--text-caption);
+  color: var(--color-tag-text);
+}

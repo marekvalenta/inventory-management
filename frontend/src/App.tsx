@@ -7,6 +7,7 @@ import { ToastContainer } from './components/common/Toast'
 import { AppLayout } from './components/layout/AppLayout'
 import { LocationsPage } from './pages/LocationsPage'
 import { LocationDetailPage } from './pages/LocationDetailPage'
+import { TagsPage } from './pages/TagsPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -28,7 +29,7 @@ function App() {
                 <Route path="definitions" element={<HomePage />} />
                 <Route path="definitions/:id" element={<HomePage />} />
                 <Route path="instances/:id" element={<HomePage />} />
-                <Route path="tags" element={<HomePage />} />
+                <Route path="tags" element={<TagsPage />} />
                 <Route path="settings" element={<HomePage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
