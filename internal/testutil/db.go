@@ -126,6 +126,11 @@ CREATE TABLE settings (
 	if _, err := db.Exec(schema); err != nil {
 		t.Fatalf("failed to run migrations: %v", err)
 	}
+
+	_, err := db.Exec(`CREATE UNIQUE INDEX IF NOT EXISTS idx_item_definitions_name ON item_definitions(name)`)
+	if err != nil {
+		t.Fatalf("failed to create unique index on item_definitions.name: %v", err)
+	}
 }
 
 func SeedRootLocation(t *testing.T, db *sql.DB) (rootID string, settingsID string) {

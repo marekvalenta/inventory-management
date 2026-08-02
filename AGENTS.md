@@ -7,7 +7,7 @@
 ## 🚀 Workspace & Project Overview
 
 - **Project Name:** InventoryManagement
-- **Phase:** Implementation — foundational PRDs are being implemented. PRDs 1–6 are implemented; PRD 7 (item-definitions) is next.
+- **Phase:** Implementation — foundational PRDs are being implemented. PRDs 1–7 are implemented; PRD 8 (item-instances) is next.
 - **PRD Directory:** `prd/` (contains all feature specs: `prd/prd-[feature-name].md`)
 - **Custom Skills Directory:** `.agents/skills/`
 
@@ -38,7 +38,7 @@
 | — | `prd-visual-design.md` | Complete visual design system — colors, typography, spacing, key page layouts, component states | ✅ Done |
 | 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Implemented |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Implemented |
-| 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
+| 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Implemented |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
 | 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | ✅ Done |
 | 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |

@@ -1,0 +1,223 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  padding-bottom: calc(var(--space-4xl) + 56px);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+}
+
+.heading {
+  font: var(--text-h1);
+  margin: 0;
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-xl);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background var(--transition-fast);
+}
+
+.addButton:hover {
+  background: var(--color-accent-hover);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4xl) var(--space-lg);
+  text-align: center;
+}
+
+.emptyText {
+  font: var(--text-body-strong);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-xl) 0;
+}
+
+.emptyButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-xl);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background var(--transition-fast);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.card:hover {
+  border-color: var(--color-accent);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-sm);
+}
+
+.cardName {
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+}
+
+.cardUnit {
+  font: var(--text-small);
+  color: var(--color-text-secondary);
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.cardBottom {
+  font: var(--text-small);
+  color: var(--color-text-secondary);
+}
+
+.formCard {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.formLabel {
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+}
+
+.formInput {
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font: var(--text-body);
+  padding: var(--space-sm) var(--space-md);
+  min-height: 40px;
+  transition: border-color var(--transition-fast);
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.formTextarea {
+  composes: formInput;
+  min-height: 80px;
+  resize: vertical;
+}
+
+.formCheckbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--text-body);
+  cursor: pointer;
+}
+
+.fieldError {
+  font: var(--text-small);
+  color: var(--color-danger);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+}
+
+.cancelButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-xl);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background var(--transition-fast);
+}
+
+.cancelButton:hover {
+  background: var(--color-bg-surface-alt);
+}
+
+.saveButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-xl);
+  font: var(--text-body-strong);
+  cursor: pointer;
+  min-height: 44px;
+  transition: background var(--transition-fast);
+}
+
+.saveButton:hover {
+  background: var(--color-accent-hover);
+}
+
+.saveButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
