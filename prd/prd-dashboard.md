@@ -1,7 +1,7 @@
 # PRD: Dashboard — InventoryManagement
 
-> **Status:** Done v1.0
-> **Scope:** Landing page (route `/`) — top-level stat cards, location breakdown ranked by item count, non-functional search bar placeholder, and guided 3-step onboarding for new users.
+> **Status:** Done v1.0 (updated by PRD #12 — search bar now functional)
+> **Scope:** Landing page (route `/`) — top-level stat cards, location breakdown ranked by item count, functional search bar (wired up per PRD #12), and guided 3-step onboarding for new users.
 
 ---
 
@@ -27,7 +27,7 @@
 | 1 | Overarching PRD §11 lists "No reporting, analytics, or dashboards beyond basic totals" as a non-goal. This dashboard PRD covers basic totals + location breakdown — **consistent** with the stated boundary. | `prd-overarching-architecture.md` | Confirmed alignment. This PRD respects the "basic totals only" constraint: no charts, no time-series, no aggregation by date ranges, no export. Stat cards + ranked location list only. |
 | 2 | No dashboard route exists in the frontend architecture or visual design PRDs. The visual design PRD shows 4 bottom nav tabs: Locations, Definitions, Tags, Settings. No dashboard tab. | `prd-frontend-architecture.md`, `prd-visual-design.md` | **Dashboard is the home page at route `/`, not a nav tab.** It is reached via the app name in the header (mobile) or logo in sidebar (desktop). Clicking the app name navigates to `/` from anywhere. Bottom nav stays at 4 items. No new tab added. |
 | 3 | No dedicated `/api/v1/dashboard` endpoint group exists in overarching §5.2. | `prd-overarching-architecture.md` | **Add `GET /api/v1/dashboard`** to the endpoint groups. Read-only, no mutations. Returns aggregated stats + location breakdown. |
-| 4 | Quick search bar is mentioned in dashboard scope but the search feature is PRD #12. | `prd-search.md` (not yet written) | **Dashboard renders a non-functional search bar placeholder.** It is visually present and styled but does nothing on submit. PRD #12 wires it up (adds the `onSubmit` handler navigating to `/search?q=...`). The placeholder includes the search input and a magnifying glass icon — just no submit behavior. |
+| 4 | Quick search bar is mentioned in dashboard scope but the search feature is separate. | `prd-search.md` | **Resolved by PRD #12.** The dashboard search bar is now a functional search bar — pressing Enter navigates to `/search?q=...` and typing triggers the quick-results dropdown. See `prd-search.md` for full search implementation. The `SearchBar` component is shared, imported from `frontend/src/components/SearchBar.tsx`. |
 | 5 | "Recent activity" was listed in the overarching PRD dashboard description but the database has no activity/audit log table. | `prd-database-schema.md` | **Recent activity is deferred to v2.** No `updated_at`-sorted feed. The dashboard focuses on stat cards + location breakdown only. |
 
 ### Confirmed Alignments
@@ -47,7 +47,7 @@ The dashboard is the first screen a user sees when opening InventoryManagement. 
 ### Core Deliverables
 1. **Stat cards:** 4 top-level aggregated counts — total locations, definitions, instances, and aggregate quantity.
 2. **Location breakdown:** All locations ranked by recursive instance count, with expandable sub-location counts.
-3. **Search bar placeholder:** Prominent, styled, non-functional input. Visually signals "search is here" without the backend implementation.
+3. **Search bar:** Prominent, styled input at the top of the dashboard. Typing triggers a quick-results dropdown; submitting navigates to the full search results page per `prd-search.md`.
 4. **3-step onboarding guide:** Shown when the user has not yet completed the core setup loop (no locations beyond root, no definitions, no instances). Clickable CTAs link to the relevant pages.
 5. **Single API endpoint:** `GET /api/v1/dashboard` returns all dashboard data in one request.
 
@@ -61,7 +61,7 @@ The dashboard is the first screen a user sees when opening InventoryManagement. 
 | Single request | Entire dashboard data returned in one `GET /api/v1/dashboard` call |
 | Immediate insight | User can see total item count and top 3 locations without scrolling (mobile) |
 | Clear onboarding | New users presented with the 3-step guide; each step links to the correct page |
-| Search bar placeholder | Visible search bar at top of dashboard on both mobile and desktop, non-functional |
+| Search bar | Visible search bar at top of dashboard on both mobile and desktop, functional per `prd-search.md` |
 | Responsive | Layout correct on 375px, 768px, 1280px, 1920px |
 | Zero schema impact | No new tables or columns. All queries are read-only against existing schema. |
 
@@ -73,7 +73,7 @@ The dashboard is the first screen a user sees when opening InventoryManagement. 
 |---|---|
 | Slow dashboard query with many instances | Recursive instance count per location uses a single recursive CTE per request. Benchmark: < 100ms for 5000 instances across 200 locations. |
 | Onboarding card flickers on page load (shows temporarily even when data exists) | API response includes `is_onboarding` boolean. Card only renders when `is_onboarding: true`. No client-side flicker. |
-| Search bar creates false expectations | Placeholder text reads "Search" with a magnifying glass icon. Tab/focus works visually, but Enter/submit does nothing. PRD #12 adds the handler. If users complain, the bar can be hidden via a feature flag — but that's unlikely given the explicit v1 decision. |
+| Search bar in header on other pages | PRD #12 implements a persistent header search bar on all pages (mobile: collapsible icon; desktop: inline input). The dashboard's centered search bar is the most prominent entry point, but search is accessible everywhere. |
 | Large location hierarchy produces cluttered ranked list | If > 20 locations exist, show only top-level locations by default with a "Show all X sub-locations" expand toggle. Sub-location counts are included in the parent's total. |
 | Dashboard page navigation from anywhere | App name in header (mobile) and logo area in sidebar (desktop) navigate to `/`. React Router handles this. No new nav tab needed. |
 
@@ -137,18 +137,19 @@ The dashboard is the first screen a user sees when opening InventoryManagement. 
 - [ ] Error state: inline error with retry button per visual PRD §6.9.
 - [ ] **[UI]** Verified in browser.
 
-### US-005: Search Bar Placeholder
-**Description:** As a user, I want a visible search bar on the dashboard so I know search is available (even though the backend isn't wired up yet).
+### US-005: Search Bar
+**Description:** As a user, I want a functional search bar on the dashboard so I can quickly find locations, definitions, and instances by name.
 
 **Acceptance Criteria:**
 - [ ] A search input field is rendered at the top of the dashboard page, above the stat cards.
 - [ ] Styled as a form input (bg `--color-bg-surface`, border `--color-border`, `--radius-md`, height 44px, padding `--space-md`, full width on mobile, max-width 480px centered on desktop).
 - [ ] Includes a magnifying glass icon (Radix Icons, 18x18px, `--color-text-secondary`) positioned inside the input on the left.
 - [ ] Placeholder text: "Search inventory..." (`--text-body`, `--color-text-secondary`).
-- [ ] The input accepts focus and text entry. Pressing Enter or clicking the icon does **nothing** — no navigation, no API call, no error. The `onSubmit` handler is a no-op.
+- [ ] The input accepts focus and text entry. Typing ≥ 2 characters triggers a quick-results dropdown showing top 3 matches per entity type (locations, definitions, instances) with a "Show all results..." link. Pressing Enter or clicking the magnifying glass navigates to `/search?q=<term>` — the full search results page.
+- [ ] The quick-results dropdown and search wiring are implemented per `prd-search.md` US-003 and US-004. The `SearchBar` component is shared at `frontend/src/components/SearchBar.tsx`.
 - [ ] Desktop: the search bar is centered below the page header, max-width 480px, with generous vertical padding (`--space-3xl`) to make it a visual anchor.
 - [ ] Mobile: full-width, directly below the header, padded horizontally by `--space-lg`.
-- [ ] The search bar is always visible, regardless of whether onboarding is shown. Even during onboarding, the search bar is present (non-functional).
+- [ ] The search bar is always visible, regardless of whether onboarding is shown.
 - [ ] **[UI]** Verified in browser on both 375px and 1920px viewports.
 
 ### US-006: 3-Step Onboarding Guide
@@ -393,7 +394,7 @@ func (s *DashboardService) GetDashboard(ctx context.Context) (*DashboardData, er
 **FR-13:** `DashboardPage` component structure:
 ```
 <DashboardPage>
-  <SearchBar />           ← placeholder, non-functional
+  <SearchBar />           ← functional search bar (wired per prd-search.md)
   <OnboardingGuide />     ← conditional (is_onboarding === true)
   <StatCards />           ← always shown (zero counts OK)
   <LocationBreakdown />   ← conditional (is_onboarding === false)
@@ -426,11 +427,12 @@ func (s *DashboardService) GetDashboard(ctx context.Context) (*DashboardData, er
 - Steps are not clickable individually — only the CTA buttons link to the respective pages.
 - CTA buttons: Primary variant (`--color-accent` bg), small (`--text-small`, height 32px), inline within each step row.
 
-**FR-17:** `SearchBar` placeholder:
+**FR-17:** `SearchBar` shared component:
 - Renders a styled `<input type="search">` with a magnifying glass icon.
-- `onSubmit` handler is a no-op (empty function body).
-- Not wrapped in a `<form>` (to prevent any default submission behavior), but the input is focusable and accepts text.
-- PRD #12 will wrap this in a `<form>` and add the submit handler. The search bar component should be in a shared location (e.g., `frontend/src/components/SearchBar.tsx`) so PRD #12 can import and enhance it without moving code.
+- On change (≥ 2 chars, 300ms debounce): fires TanStack Query `['search', { q, limit: 3 }]` and renders the quick-results dropdown below the input.
+- On Enter or magnifying glass click: navigates to `/search?q=<term>` via React Router.
+- The component is shared at `frontend/src/components/SearchBar.tsx` and also used in the persistent header search bar (mobile + desktop) per `prd-search.md` US-001/US-002.
+- The dashboard uses the `SearchBar` component — no separate dashboard-specific search bar implementation.
 
 **FR-18:** Query invalidation: the `['dashboard']` query is invalidated on any successful mutation across the app (create/update/delete location, definition, instance, tag). Use TanStack Query's `queryClient.invalidateQueries({ queryKey: ['dashboard'] })` in mutation `onSuccess` callbacks. Since the dashboard is a landing page and not frequently visited during active use, `staleTime: 30_000` (30s) is appropriate — the dashboard won't refetch unnecessarily during navigation but will be fresh when the user returns to it.
 
@@ -465,7 +467,7 @@ func (s *DashboardService) GetDashboard(ctx context.Context) (*DashboardData, er
 - **Charts / graphs / time-series:** No bar charts, line graphs, or trend visualizations. Stats are displayed as numbers only.
 - **"Recent activity" feed:** Deferred to v2. Requires an audit log table (`instance_audit_log` or similar). No activity rows on the dashboard.
 - **Date-range filters:** No "last 7 days" or "this month" aggregation. All stats are current totals.
-- **Functional search bar:** The dashboard renders a non-functional placeholder. Search logic, search results page, and wiring of the bar are PRD #12.
+- **Search logic, search results page, and search wiring:** Handled by `prd-search.md`. The dashboard renders the shared `SearchBar` component and does not implement search logic itself.
 - **Dashboard customization:** No user-configurable widget layout, no show/hide toggles, no card reordering.
 - **Export / print:** No CSV/PDF export of dashboard data.
 - **Notification badges:** No "3 new items" or "5 untagged definitions" badges on stat cards.

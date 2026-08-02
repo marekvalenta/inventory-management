@@ -42,8 +42,8 @@
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Implemented |
 | 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | ✅ Done |
 | 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | ✅ Done |
-| 11 | `prd-dashboard.md` | Dashboard — totals, location breakdown, search bar placeholder, onboarding | ✅ Done |
-| 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | 🔲 Planned |
+| 11 | `prd-dashboard.md` | Dashboard — totals, location breakdown, search bar placeholder, onboarding | ✅ Done (updated by PRD #12) |
+| 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | ✅ Done |
 | 13 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
 
 ### Status Key
