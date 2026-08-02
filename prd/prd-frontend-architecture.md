@@ -104,17 +104,8 @@ This PRD establishes the core frontend architecture for the InventoryManagement 
 
 ### TR-1: Styling & Design System
 - **CSS Strategy:** Use standard CSS Modules (`[name].module.css`).
-- **Design Tokens:** Define global CSS variables in `index.css` for colors, typography, spacing, and border-radii.
-  ```css
-  :root {
-    --color-bg-primary: #121212;
-    --color-text-primary: #E0E0E0;
-    --color-accent: #007BFF;
-    --radius-md: 8px;
-    /* ... */
-  }
-  ```
-- **Aesthetics:** The design must utilize rich aesthetics including harmonious color palettes, modern web fonts (e.g., Inter or Roboto), subtle gradients, glassmorphism where appropriate, and micro-animations for hover/active states.
+- **Design Tokens:** The canonical design tokens (colors, typography, spacing, shadows, border-radius, transitions) are defined in `prd-visual-design.md` §3. All component CSS must use semantic CSS variables — never raw hex/spacing values. The palette is Golden Amber (warm dark mode), font stack is Nunito (headings) + DM Sans (body).
+- **Aesthetics:** The design uses a warm/material card aesthetic — dark, rounded, card-based. Soft warm browns and creams with golden amber accents. Subtle warm-toned shadows for depth. Micro-animations for hover/active states.
 
 ### TR-2: State Management (TanStack Query)
 - Use React Query for all API interactions.
@@ -163,5 +154,5 @@ This PRD establishes the core frontend architecture for the InventoryManagement 
 | # | Question | Status |
 |---|---|---|
 | OQ-1 | Should we implement a Dark Mode / Light Mode toggle in v1? | Deferred to Settings PRD, but the CSS variables should be structured to support it trivially. |
-| OQ-2 | What specific font family should be standard? | Deferred to implementation, but a modern sans-serif like 'Inter' is highly recommended. |
+| OQ-2 | What specific font family should be standard? | Resolved — Nunito (600/700 for headings) + DM Sans (400/500 for body) per `prd-visual-design.md` §3.2. |
 | OQ-3 | Do we need a unified form validation library (e.g., React Hook Form + Zod)? | Deferred. For simple v1 forms, controlled components might suffice. If forms grow complex, React Hook Form is the preferred choice. |
