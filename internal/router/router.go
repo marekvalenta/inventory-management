@@ -37,9 +37,12 @@ func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 	definitionHandler := handler.NewDefinitionHandler(definitionSvc)
 	instanceSvc := service.NewInstanceService(db)
 	instanceHandler := handler.NewInstanceHandler(instanceSvc)
+	dashboardSvc := service.NewDashboardService(db)
+	dashboardHandler := handler.NewDashboardHandler(dashboardSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
+		dashboardHandler.RegisterRoutes(r)
 		locationHandler.RegisterRoutes(r)
 		tagHandler.RegisterRoutes(r)
 		definitionHandler.RegisterRoutes(r)
@@ -75,9 +78,12 @@ func NewTestRouter(db *sql.DB) chi.Router {
 	definitionHandler := handler.NewDefinitionHandler(definitionSvc)
 	instanceSvc := service.NewInstanceService(db)
 	instanceHandler := handler.NewInstanceHandler(instanceSvc)
+	dashboardSvc := service.NewDashboardService(db)
+	dashboardHandler := handler.NewDashboardHandler(dashboardSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
+		dashboardHandler.RegisterRoutes(r)
 		locationHandler.RegisterRoutes(r)
 		tagHandler.RegisterRoutes(r)
 		definitionHandler.RegisterRoutes(r)

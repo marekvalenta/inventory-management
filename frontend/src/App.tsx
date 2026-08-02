@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ToastProvider } from './context/ToastContext'
 import { OnlineStatusProvider } from './context/OnlineStatusContext'
 import { OfflineBanner } from './components/common/OfflineBanner'
@@ -11,6 +11,7 @@ import { DefinitionListPage } from './pages/DefinitionListPage'
 import { DefinitionDetailPage } from './pages/DefinitionDetailPage'
 import { InstanceDetailPage } from './pages/InstanceDetailPage'
 import { TagsPage } from './pages/TagsPage'
+import { DashboardPage } from './pages/DashboardPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 
@@ -26,7 +27,7 @@ function App() {
             <ToastContainer />
             <Routes>
               <Route element={<AppLayout />}>
-                <Route index element={<Navigate to="/locations" replace />} />
+                <Route index element={<DashboardPage />} />
                 <Route path="locations" element={<LocationsPage />} />
                 <Route path="locations/:id" element={<LocationDetailPage />} />
                 <Route path="definitions" element={<DefinitionListPage />} />

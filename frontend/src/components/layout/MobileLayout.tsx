@@ -1,4 +1,4 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { NavLink, Outlet, Link } from 'react-router-dom'
 import { HomeIcon, CubeIcon, BookmarkIcon, GearIcon } from '@radix-ui/react-icons'
 import styles from './MobileLayout.module.css'
 
@@ -13,7 +13,7 @@ export function MobileLayout() {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <span className={styles.headerTitle}>Itema</span>
+        <Link to="/" className={styles.headerTitle}>Itema</Link>
         <div className={styles.headerActions} />
       </header>
       <main className={styles.content}>
