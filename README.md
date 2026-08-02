@@ -1,4 +1,4 @@
-# InventoryManagement
+# Itema
 
 A self-hosted inventory management app. Track physical items across hierarchical locations.
 Built with Go + SQLite backend and a React frontend. Runs in a single Docker container.
@@ -59,16 +59,15 @@ make dev
 
 ```yaml
 services:
-  inventory:
-    image: inventory-management:latest
-    container_name: inventory
+  itema:
+    image: itema:latest
+    container_name: itema
     ports:
       - "8080:8080"
     volumes:
       - ./data:/data
     environment:
       - APP_PORT=8080
-      - APP_NAME=My Inventory
     restart: unless-stopped
 ```
 

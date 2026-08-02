@@ -13,7 +13,7 @@ export function MobileLayout() {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <span className={styles.headerTitle}>Inventory</span>
+        <span className={styles.headerTitle}>Itema</span>
         <div className={styles.headerActions} />
       </header>
       <main className={styles.content}>

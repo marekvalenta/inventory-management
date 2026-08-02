@@ -116,8 +116,7 @@ CREATE TABLE instance_field_values (
 
 CREATE TABLE settings (
     id               INTEGER PRIMARY KEY CHECK (id = 1),
-    app_name         TEXT NOT NULL DEFAULT 'Inventory',
-    theme            TEXT NOT NULL DEFAULT 'system',
+    theme            TEXT NOT NULL DEFAULT 'dark',
     root_location_id TEXT REFERENCES locations(id),
     created_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -147,8 +146,8 @@ func SeedRootLocation(t *testing.T, db *sql.DB) (rootID string, settingsID strin
 	}
 
 	_, err = db.Exec(
-		"INSERT INTO settings (id, app_name, theme, root_location_id) VALUES (1, ?, ?, ?)",
-		"Inventory", "system", rootID,
+		"INSERT INTO settings (id, theme, root_location_id) VALUES (1, ?, ?)",
+		"dark", rootID,
 	)
 	if err != nil {
 		t.Fatalf("failed to seed settings: %v", err)

@@ -15,7 +15,6 @@ const (
 
 type Config struct {
 	Port     string
-	AppName  string
 	DataDir  string
 	LogLevel LogLevel
 }
@@ -23,7 +22,7 @@ type Config struct {
 func Load() *Config {
 	cfg := &Config{
 		Port:     envOrDefault("APP_PORT", "8080"),
-		AppName:  envOrDefault("APP_NAME", "Inventory"),
+
 		DataDir:  envOrDefault("DATA_DIR", "./data"),
 		LogLevel: LogLevel(envOrDefault("LOG_LEVEL", "info")),
 	}

@@ -27,8 +27,8 @@ func AutoSeed(database *sql.DB) {
 	}
 
 	if _, err := database.Exec(
-		"INSERT INTO settings (id, app_name, theme, root_location_id) VALUES (1, ?, ?, ?)",
-		"Inventory", "system", rootID,
+		"INSERT INTO settings (id, theme, root_location_id) VALUES (1, ?, ?)",
+		"dark", rootID,
 	); err != nil {
 		log.Fatalf("failed to seed settings: %v", err)
 	}

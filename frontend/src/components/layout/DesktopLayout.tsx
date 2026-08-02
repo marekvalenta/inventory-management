@@ -17,8 +17,8 @@ export function DesktopLayout() {
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.logo}>
-          <span className={styles.logoMark}>INV</span>
-          <span className={styles.logoText}>Inventory</span>
+          <span className={styles.logoMark}>ITM</span>
+          <span className={styles.logoText}>Itema</span>
         </div>
         {primaryNav.map(({ to, label, icon: Icon }) => (
           <NavLink
