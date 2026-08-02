@@ -16,10 +16,10 @@ export function DesktopLayout() {
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <div className={styles.logo}>
-          <span className={styles.logoMark}>ITM</span>
+        <NavLink to="/" className={styles.logo}>
+          <img src="/icon.svg" alt="Itema" className={styles.logoIcon} width={32} height={32} />
           <span className={styles.logoText}>Itema</span>
-        </div>
+        </NavLink>
         {primaryNav.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}

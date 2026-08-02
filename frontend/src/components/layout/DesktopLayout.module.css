@@ -20,14 +20,17 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   height: 64px;
   padding: 0 var(--space-lg);
+  text-decoration: none;
+  color: inherit;
 }
 
-.logoMark {
-  font: var(--text-h3);
-  color: var(--color-accent);
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
 }
 
 .logoText {
