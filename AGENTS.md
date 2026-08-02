@@ -44,7 +44,7 @@
 | 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | ✅ Done |
 | 11 | `prd-dashboard.md` | Dashboard — totals, location breakdown, search bar placeholder, onboarding | ✅ Done (updated by PRD #12) |
 | 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | ✅ Done |
-| 13 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
+| 13 | `prd-settings.md` | Settings page — UI + backend, theme selector, typed-struct extensibility, app renamed to Itema | ✅ Done |
 
 ### Status Key
 - ✅ Implemented — PRD written, approved, and fully implemented (all code + tests)
