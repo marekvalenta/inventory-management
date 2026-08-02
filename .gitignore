@@ -1,45 +1,23 @@
+# Go
 /bin/
 /tmp/
 *.exe
-*.exe~
-*.dll
-*.so
-*.dylib
 *.test
 *.out
-*.prof
-coverage.txt
 go.work
 go.work.sum
 
-node_modules/
-dist/
-.vite/
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
 
-*.db
-*.db-shm
-*.db-wal
-
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-*.sublime-workspace
-*.sublime-project
-
+# OS
 .DS_Store
 Thumbs.db
 desktop.ini
-*.tmp
 
-test-results/
-playwright-report/
-
-*.log
+# SQLite (local dev DB)
+*.db
+*.db-shm
+*.db-wal

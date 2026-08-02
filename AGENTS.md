@@ -1,6 +1,6 @@
 # InventoryManagement - Agent Instructions (`AGENTS.md`)
 
-> **CURRENT PHASE: PLANNING** — No code has been written yet. All PRDs are being aligned in `prd/`. Do NOT create migrations, patches, or assume anything is already implemented. When a PRD references another PRD's schema/API/component and a conflict is found, update the source PRD — do NOT create a separate "fix" or migration. The goal is a fully consistent spec before any implementation begins.
+> **CURRENT PHASE: IMPLEMENTATION** — Foundational PRDs are being implemented in numbered order. Features are built incrementally. When a PRD references another PRD's schema/API/component and a conflict is found, update the source PRD — do NOT create a separate "fix" or migration.
 
 **CRITICAL:** Never start changing the code without my confirmation, unless it is a trivial change. This is to prevent you from making incorrect changes to the codebase.
 
@@ -31,7 +31,7 @@
 | # | PRD File | Topic | Status |
 |---|---|---|---|
 | 0 | `prd-overarching-architecture.md` | High-level architecture, tech stack, data model, testing strategy | ✅ Done |
-| 1 | `prd-project-setup.md` | Repo structure, Go module, Vite init, Makefile, README | ✅ Done |
+| 1 | `prd-project-setup.md` | Repo structure, Go module, Vite init, Makefile, README | ✅ Implemented |
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Done |
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Done |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Done |
@@ -47,6 +47,7 @@
 | 13 | `prd-settings.md` | Settings page — UI + backend, app name, display prefs in SQLite | 🔲 Planned |
 
 ### Status Key
+- ✅ Implemented — PRD written, approved, and fully implemented (all code + tests)
 - ✅ Done — PRD written and approved
 - 🔄 In Progress — PRD being written or feature being implemented
 - 🔲 Planned — Not yet started
