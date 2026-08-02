@@ -1,27 +1,20 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { PlusIcon, Pencil1Icon, TrashIcon, Cross2Icon } from '@radix-ui/react-icons'
+import { PlusIcon, Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { fetchTags, createTag, updateTag, deleteTag } from '../api/tags'
 import type { Tag, CreateTagRequest, UpdateTagRequest } from '../api/tags'
 import { TagBadge } from '../components/tags/TagBadge'
 import { DeleteTagDialog } from '../components/tags/DeleteTagDialog'
+import { CreateEditTagModal } from '../components/tags/CreateEditTagModal'
 import { useToast } from '../context/ToastContext'
 import styles from './TagsPage.module.css'
-
-type FormMode = 'create' | { edit: Tag }
-
-function isValidHex(value: string): boolean {
-  return /^#[0-9A-Fa-f]{6}$/.test(value)
-}
 
 export function TagsPage() {
   const queryClient = useQueryClient()
   const { addToast } = useToast()
 
-  const [formMode, setFormMode] = useState<FormMode | null>(null)
-  const [formName, setFormName] = useState('')
-  const [formColor, setFormColor] = useState('')
-  const [formNameError, setFormNameError] = useState('')
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingTag, setEditingTag] = useState<Tag | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Tag | null>(null)
 
   const { data: tags, isLoading, error } = useQuery({
@@ -33,9 +26,8 @@ export function TagsPage() {
     mutationFn: (data: CreateTagRequest) => createTag(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tags'] })
-      setFormMode(null)
-      setFormName('')
-      setFormColor('')
+      setModalOpen(false)
+      setEditingTag(null)
       addToast('Tag created', 'success')
     },
     onError: (err: Error) => {
@@ -47,9 +39,8 @@ export function TagsPage() {
     mutationFn: ({ id, data }: { id: string; data: UpdateTagRequest }) => updateTag(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tags'] })
-      setFormMode(null)
-      setFormName('')
-      setFormColor('')
+      setModalOpen(false)
+      setEditingTag(null)
       addToast('Tag updated', 'success')
     },
     onError: (err: Error) => {
@@ -59,7 +50,7 @@ export function TagsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteTag(id),
-    onSuccess: (_data, id) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tags'] })
       setDeleteTarget(null)
       addToast('Tag deleted', 'success')
@@ -71,54 +62,20 @@ export function TagsPage() {
   })
 
   const handleStartCreate = () => {
-    setFormMode('create')
-    setFormName('')
-    setFormColor('')
-    setFormNameError('')
+    setEditingTag(null)
+    setModalOpen(true)
   }
 
   const handleStartEdit = (tag: Tag) => {
-    setFormMode({ edit: tag })
-    setFormName(tag.name)
-    setFormColor(tag.color || '')
-    setFormNameError('')
+    setEditingTag(tag)
+    setModalOpen(true)
   }
 
-  const handleCancel = () => {
-    setFormMode(null)
-    setFormName('')
-    setFormColor('')
-    setFormNameError('')
-  }
-
-  const validate = (): boolean => {
-    const trimmed = formName.trim()
-    if (trimmed.length < 2) {
-      setFormNameError('Name must be at least 2 characters')
-      return false
-    }
-    if (trimmed.length > 100) {
-      setFormNameError('Name must be at most 100 characters')
-      return false
-    }
-    setFormNameError('')
-    return true
-  }
-
-  const handleSave = () => {
-    if (!validate()) return
-
-    const name = formName.trim()
-    const color = formColor.trim() || null
-
-    if (formMode === 'create') {
-      createMutation.mutate({ name, color })
-    } else if (typeof formMode === 'object') {
-      const tag = formMode.edit
-      const data: UpdateTagRequest = {}
-      if (name !== tag.name) data.name = name
-      if (color !== (tag.color || '')) data.color = color
-      updateMutation.mutate({ id: tag.id, data })
+  const handleModalSave = (data: CreateTagRequest | UpdateTagRequest) => {
+    if (editingTag) {
+      updateMutation.mutate({ id: editingTag.id, data: data as UpdateTagRequest })
+    } else {
+      createMutation.mutate(data as CreateTagRequest)
     }
   }
 
@@ -155,21 +112,18 @@ export function TagsPage() {
   }
 
   const tagList = tags ?? []
-  const showForm = formMode !== null
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <h1 className={styles.heading}>Tags</h1>
-        {!showForm && (
-          <button className={styles.addButton} onClick={handleStartCreate}>
-            <PlusIcon width={20} height={20} />
-            <span>Add Tag</span>
-          </button>
-        )}
+        <button className={styles.addButton} onClick={handleStartCreate}>
+          <PlusIcon width={20} height={20} />
+          <span>Add Tag</span>
+        </button>
       </div>
 
-      {!showForm && tagList.length === 0 && (
+      {tagList.length === 0 && (
         <div className={styles.empty}>
           <p className={styles.emptyText}>No tags yet — add your first tag</p>
           <button className={styles.emptyButton} onClick={handleStartCreate}>
@@ -177,69 +131,6 @@ export function TagsPage() {
             <span>Add First Tag</span>
           </button>
         </div>
-      )}
-
-      {showForm && (
-        <div className={styles.formCard}>
-          <div className={styles.formRow}>
-            <div className={styles.formField}>
-              <label className={styles.formLabel} htmlFor="tag-name">Name</label>
-              <input
-                id="tag-name"
-                className={styles.formInput}
-                type="text"
-                value={formName}
-                onChange={(e) => {
-                  setFormName(e.target.value)
-                  setFormNameError('')
-                }}
-                onBlur={validate}
-                placeholder="e.g. Fasteners, Fragile"
-                autoFocus
-                maxLength={100}
-              />
-              {formNameError && <span className={styles.fieldError}>{formNameError}</span>}
-            </div>
-            <div className={styles.formField}>
-              <label className={styles.formLabel} htmlFor="tag-color">Color</label>
-              <div className={styles.colorRow}>
-                <input
-                  id="tag-color"
-                  className={styles.formInput}
-                  type="text"
-                  value={formColor}
-                  onChange={(e) => setFormColor(e.target.value)}
-                  placeholder="#FF5733"
-                  maxLength={10}
-                />
-                <span
-                  className={styles.colorSwatch}
-                  style={{ backgroundColor: isValidHex(formColor) ? formColor : '#605C57' }}
-                />
-              </div>
-            </div>
-          </div>
-          <div className={styles.formActions}>
-            <button className={styles.cancelButton} onClick={handleCancel}>
-              <Cross2Icon width={16} height={16} />
-              <span>Cancel</span>
-            </button>
-            <button
-              className={styles.saveButton}
-              onClick={handleSave}
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {createMutation.isPending || updateMutation.isPending ? 'Saving...' : 'Save'}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!showForm && tagList.length > 0 && (
-        <button className={styles.inlineAdd} onClick={handleStartCreate}>
-          <PlusIcon width={16} height={16} />
-          <span>Add Tag</span>
-        </button>
       )}
 
       {tagList.length > 0 && (
@@ -275,6 +166,16 @@ export function TagsPage() {
           ))}
         </div>
       )}
+
+      <CreateEditTagModal
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open)
+          if (!open) setEditingTag(null)
+        }}
+        tag={editingTag}
+        onSave={handleModalSave}
+      />
 
       <DeleteTagDialog
         open={deleteTarget !== null}

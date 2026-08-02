@@ -1,7 +1,8 @@
 .container {
-  max-width: 960px;
+  max-width: 720px;
   margin: 0 auto;
   padding: var(--space-lg);
+  padding-bottom: calc(var(--space-4xl) + 56px);
 }
 
 .header {
@@ -12,7 +13,7 @@
 }
 
 .heading {
-  font: var(--text-h2);
+  font: var(--text-h1);
   margin: 0;
   color: var(--color-text-primary);
 }
@@ -20,15 +21,15 @@
 .createButton {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-lg);
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-accent);
   color: var(--color-text-inverse);
   font: var(--text-body-strong);
   cursor: pointer;
-  transition: background-color var(--transition-fast);
+  transition: background var(--transition-fast);
   min-height: 44px;
 }
 

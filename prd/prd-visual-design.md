@@ -313,7 +313,7 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 - Outer cards use `--color-bg-surface`, `--radius-md`, padding `--space-lg`
 - Child rows indented by `--space-xl` per depth level, with a 2px vertical accent line
 
-**Desktop:** Same card layout, centered at 640px max-width. Tree indentation via `--space-lg` + `--space-lg` per depth level.
+**Desktop:** Same card layout, centered at 720px max-width. Page heading uses `--text-h1` for consistency across all list pages. Tree indentation via `--space-lg` + `--space-lg` per depth level.
 
 **Empty state:** centered in content area:
 ```
@@ -400,7 +400,7 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 - Tag badges: `--radius-full`, `--text-caption`, bg `--color-tag-bg`
 - Instance summary: `--text-small`, `--color-text-secondary`
 
-**Desktop:** Max-width 720px, centered. Each card slightly wider, tag badges more spaced.
+**Desktop:** Max-width 720px, centered (unified with Locations and Tags list pages). Page heading uses `--text-h1`. Each card slightly wider, tag badges more spaced. Clicking `[+]` opens a modal dialog for creating a new definition (name, description, unit, container toggle, tags, fields).
 
 ### 5.4 Definition Detail Page (route: `/definitions/:id`)
 
@@ -522,10 +522,6 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 |  Tags                       [+]   |
 +-----------------------------------+
 | +---------------------------------+ |
-| | [+ Add Tag]                   | |
-| +---------------------------------+ |
-|                                     |
-| +---------------------------------+ |
 | | (o) Fasteners      5 defs     | |
 | |                    [e]  [x]   | |
 | +---------------------------------+ |
@@ -548,22 +544,9 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 - `[e]` = edit icon (pencil, 18x18px), `[x]` = delete icon (trash, 18x18px)
 - Tag name: `--text-body-strong`. Linked count: `--text-caption`, `--color-text-secondary`
 - Rows: bg `--color-bg-surface`, `--radius-sm`, padded
+- `[+]` header button opens a modal for create/edit (no inline forms). Modal contains Name + Color fields with live swatch preview, Cancel + Save buttons.
 
-**Desktop:** Max-width 480px, centered. Icons show hover backgrounds (`--color-bg-surface-alt`).
-
-**Inline create/edit form (expanded):**
-
-```
-+-----------------------------------+
-| Name:  [________________________]  |
-| Color: [#FF5733            ] [=]  |
-|                                    |
-|            [Cancel]    [Save]      |
-+-----------------------------------+
-```
-- `[=]` = live color swatch preview (24x24px, `--radius-sm`)
-- Text inputs: bg `--color-bg-surface`, border `--color-border`, `--radius-sm`, 40px tall
-- Cancel: text button, `--text-secondary`. Save: Primary amber pill button
+**Desktop:** Max-width 720px, centered (unified with Locations and Definitions list pages). Page heading uses `--text-h1`. Icons show hover backgrounds (`--color-bg-surface-alt`). Create/edit handled via modal dialog.
 
 **Tag badge component (reusable across all pages):**
 
@@ -575,6 +558,17 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 - `--radius-full` pill, bg `--color-tag-bg` (or tag's color at 15% opacity)
 - Left swatch: 14px `--radius-full` circle using tag's hex color
 - Text: `--text-caption`, padding `--space-xs` `--space-sm`
+
+### 5.7 Unified List Page Layout
+
+All three list pages (Locations, Definitions, Tags) share a consistent layout:
+
+- **Max-width:** 720px centered on desktop
+- **Page heading:** `--text-h1`
+- **Header bar:** Flex row with page title left and a Primary `[+]` add button right
+- **Add action:** Opens a modal dialog (no inline forms on the list page itself)
+- **Empty state:** Centered message + "Add First" button
+- **Bottom padding:** `calc(var(--space-4xl) + 56px)` to clear the mobile bottom nav
 
 ---
 
