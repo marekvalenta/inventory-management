@@ -5,7 +5,6 @@ import { fetchInstances, moveInstance } from '../../api/instances'
 import { fetchLocations } from '../../api/locations'
 import type { InstanceDetail, MoveInstanceRequest } from '../../api/instances'
 import { useToast } from '../../context/ToastContext'
-import { ApiError } from '../../api/client'
 import styles from './InstanceModals.module.css'
 
 interface MoveInstanceDialogProps {

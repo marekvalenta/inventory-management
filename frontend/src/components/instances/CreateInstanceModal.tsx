@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { fetchDefinitions, fetchDefinition } from '../../api/definitions'
 import type { CreateInstanceRequest } from '../../api/instances'
-import type { DefinitionDetail, DefinitionField } from '../../api/definitions'
+import type { DefinitionField } from '../../api/definitions'
 import styles from './InstanceModals.module.css'
 
 interface CreateInstanceModalProps {
@@ -224,7 +224,7 @@ function FieldInput({
           onChange={(e) => onChange(e.target.value || null)}
         >
           <option value="">-- Select --</option>
-          {field.enum_values.map((ev) => (
+          {field.enum_values.map((ev: string) => (
             <option key={ev} value={ev}>{ev}</option>
           ))}
         </select>

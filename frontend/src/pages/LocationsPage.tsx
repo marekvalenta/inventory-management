@@ -12,7 +12,6 @@ export function LocationsPage() {
   const queryClient = useQueryClient()
   const { addToast } = useToast()
   const [modalOpen, setModalOpen] = useState(false)
-  const [modalParentId, setModalParentId] = useState<string | null>(null)
   const [createForParent, setCreateForParent] = useState<string | null>(null)
 
   const { data: tree, isLoading, error } = useQuery({
@@ -40,7 +39,6 @@ export function LocationsPage() {
 
   const handleAddRoot = () => {
     setCreateForParent(null)
-    setModalParentId(null)
     setModalOpen(true)
   }
 

@@ -1,8 +1,13 @@
-import type { Tag } from '../../api/tags'
 import styles from './TagBadge.module.css'
 
+interface TagBadgeTag {
+  id: string
+  name: string
+  color: string | null
+}
+
 interface TagBadgeProps {
-  tag: Tag
+  tag: TagBadgeTag
   size?: 'sm' | 'md'
 }
 

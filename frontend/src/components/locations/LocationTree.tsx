@@ -3,11 +3,15 @@ import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon, PlusIcon } from '@radix-ui/react-icons'
 import { Link } from 'react-router-dom'
 import { fetchLocationChildren } from '../../api/locations'
-import type { Location } from '../../api/locations'
 import styles from './LocationTree.module.css'
 
+interface TreeNodeLike {
+  id: string
+  name: string
+}
+
 interface LocationTreeProps {
-  rootLocations: Location[]
+  rootLocations: TreeNodeLike[]
   onAddChild: (parentId: string) => void
 }
 
@@ -16,7 +20,7 @@ function TreeNodeItem({
   depth,
   onAddChild,
 }: {
-  location: Location
+  location: TreeNodeLike
   depth: number
   onAddChild: (parentId: string) => void
 }) {
@@ -29,13 +33,11 @@ function TreeNodeItem({
     enabled: !!expanded && !!hasLoaded,
   })
 
-  const hasChildren = children && children.length > 0
-
   return (
     <div className={styles.node}>
       <div
         className={styles.nodeRow}
-        style={{ paddingLeft: `${depth * var(--space-xl)}` }}
+        style={{ paddingLeft: `${depth * 1.5}rem` }}
       >
         <button
           className={styles.expandButton}
@@ -50,7 +52,7 @@ function TreeNodeItem({
             height={20}
             style={{
               transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
-              transition: `transform var(--transition-fast)`,
+              transition: 'transform 0.2s ease',
             }}
           />
         </button>
