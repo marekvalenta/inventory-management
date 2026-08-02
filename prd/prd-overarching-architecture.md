@@ -253,7 +253,16 @@ UI-level settings (theme, display preferences) are stored in a `settings` SQLite
 
 ## 8. Developer Experience
 
-Local development uses a **Makefile** as the task runner with `air` for Go hot-reload and Vite HMR for the frontend. Both run concurrently via a single `make dev` command. A PowerShell wrapper (`make.ps1`) enables the same workflow on Windows.
+Local development uses two concurrent servers:
+
+| Server | Port | Tool | Watches | Purpose |
+|---|---|---|---|---|
+| Go backend | `:8080` | Air | `.go` files | REST API + serves embedded production frontend |
+| React frontend | `:5173` | Vite | `.tsx`/`.ts`/`.css` files | Dev server with HMR, proxies `/api` to `:8080` |
+
+Both run concurrently via `make dev`. The Vite dev server proxies all `/api/*` requests to the Go backend at `:8080` — during development, always use `:5173` for instant frontend hot-reload. The `:8080` production build is useful for verifying the final embedded bundle but doesn't hot-reload frontend changes (requires `npm run build` + restart).
+
+A PowerShell wrapper (`make.ps1`) enables the same workflow on Windows. On WSL2 with the project on the Windows filesystem, production builds must run via Windows PowerShell due to the 9p filesystem cache.
 
 See `prd-project-setup.md` for the full repo structure, Makefile targets, Air configuration, and first-time setup instructions.
 

@@ -1,0 +1,105 @@
+.card {
+  background: var(--color-bg-surface-alt);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-md);
+  border: 1px solid var(--color-border);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.flex1 {
+  flex: 1;
+}
+
+.label {
+  display: block;
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.input {
+  width: 100%;
+  background: var(--color-bg-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font: var(--text-body);
+  padding: var(--space-sm) var(--space-md);
+  min-height: 40px;
+  transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.fieldGroup {
+  margin-bottom: var(--space-md);
+}
+
+.checkboxRow {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font: var(--text-body);
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.moveGroup {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.smallButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-md);
+  font: var(--text-small);
+  cursor: pointer;
+  min-height: 36px;
+  transition: background var(--transition-fast);
+}
+
+.smallButton:hover {
+  background: var(--color-accent-muted);
+}
+
+.smallButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.removeButton {
+  background: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-md);
+  font: var(--text-small);
+  cursor: pointer;
+  min-height: 36px;
+}

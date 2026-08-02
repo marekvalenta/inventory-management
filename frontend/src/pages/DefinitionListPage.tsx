@@ -3,10 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { PlusIcon, Cross2Icon } from '@radix-ui/react-icons'
 import { fetchDefinitions, createDefinition } from '../api/definitions'
-import type { CreateFieldInput, CreateDefinitionRequest } from '../api/definitions'
+import type { CreateDefinitionRequest, CreateFieldInput } from '../api/definitions'
 import { fetchTags } from '../api/tags'
 import type { Tag } from '../api/tags'
 import { TagBadge } from '../components/tags/TagBadge'
+import { FieldEditor } from '../components/definitions/FieldEditor'
 import { useToast } from '../context/ToastContext'
 import styles from './DefinitionListPage.module.css'
 
@@ -21,6 +22,7 @@ export function DefinitionListPage() {
   const [formIsContainer, setFormIsContainer] = useState(false)
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [formNameError, setFormNameError] = useState('')
+  const [ownFields, setOwnFields] = useState<CreateFieldInput[]>([])
 
   const { data: definitions, isLoading, error } = useQuery({
     queryKey: ['definitions'],
@@ -52,6 +54,7 @@ export function DefinitionListPage() {
     setFormIsContainer(false)
     setSelectedTagIds([])
     setFormNameError('')
+    setOwnFields([])
   }
 
   const handleAddClick = () => {
@@ -62,6 +65,41 @@ export function DefinitionListPage() {
   const handleCancel = () => {
     setShowForm(false)
     resetForm()
+  }
+
+  const addOwnField = () => {
+    setOwnFields((prev) => [
+      ...prev,
+      {
+        field_name: '',
+        field_type: 'text',
+        enum_values: null,
+        is_required: false,
+        display_order: prev.length,
+        default_value: null,
+        is_child_editable: false,
+      },
+    ])
+  }
+
+  const updateOwnField = (index: number, updates: Partial<CreateFieldInput>) => {
+    setOwnFields((prev) =>
+      prev.map((f, i) => (i === index ? { ...f, ...updates } : f)),
+    )
+  }
+
+  const removeOwnField = (index: number) => {
+    setOwnFields((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const moveField = (index: number, direction: 'up' | 'down') => {
+    setOwnFields((prev) => {
+      const newFields = [...prev]
+      const targetIndex = direction === 'up' ? index - 1 : index + 1
+      if (targetIndex < 0 || targetIndex >= newFields.length) return prev
+      ;[newFields[index], newFields[targetIndex]] = [newFields[targetIndex], newFields[index]]
+      return newFields.map((f, i) => ({ ...f, display_order: i }))
+    })
   }
 
   const validate = (): boolean => {
@@ -89,6 +127,7 @@ export function DefinitionListPage() {
       unit: unit && unit.length <= 20 ? unit : null,
       is_container: formIsContainer,
       tag_ids: selectedTagIds,
+      fields: ownFields.length > 0 ? ownFields : undefined,
     })
   }
 
@@ -219,6 +258,29 @@ export function DefinitionListPage() {
               </div>
             </div>
           )}
+
+          <div className={styles.formField}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <label className={styles.formLabel}>Fields</label>
+            </div>
+            {ownFields.map((field, idx) => (
+              <FieldEditor
+                key={idx}
+                field={field}
+                index={idx}
+                total={ownFields.length}
+                onChange={(updates) => updateOwnField(idx, updates)}
+                onRemove={() => removeOwnField(idx)}
+                onMoveUp={() => moveField(idx, 'up')}
+                onMoveDown={() => moveField(idx, 'down')}
+                showInheritedControls={true}
+              />
+            ))}
+            <button className={styles.smallButton} onClick={addOwnField}>
+              <PlusIcon width={14} height={14} />
+              Add Field
+            </button>
+          </div>
 
           <div className={styles.formActions}>
             <button className={styles.cancelButton} onClick={handleCancel}>

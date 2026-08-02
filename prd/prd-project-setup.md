@@ -457,6 +457,7 @@ To execute this PRD flawlessly, follow these exact steps in order:
 | `npm install` not run in `frontend/` | `npm run dev` fails. Agent must run `npm install --prefix frontend`. |
 | Makefile saved with CRLF on Windows | `make` fails with cryptic errors. `.gitattributes` enforces LF for Makefile. |
 | Developer on macOS or Linux | `make dev` works natively. `make.ps1` is Windows-only and ignored. |
+| WSL2 with project on Windows filesystem (`/mnt/c/`) | Linux-side `npm` may not see file changes made through Linux tools due to 9p cache. Production build MUST run via Windows PowerShell. Vite dev server (`npm run dev`) works correctly for HMR when accessed from Windows browser. |
 
 ---
 
@@ -661,3 +662,4 @@ Example: `import "github.com/marekvalenta/inventory-management/internal/service"
 | OQ-1 | Should `make dev` auto-run `npm install` if `node_modules` missing? Adds convenience but slows every start. | Deferred — manual first-time setup documented in README |
 | OQ-2 | VSCode workspace settings (`.vscode/`) | Deferred — add in a future polish pass if needed |
 | OQ-3 | Should `make.ps1` support env var overrides passed as additional args? | Current implementation passes `$ExtraArgs` through — already supported |
+| OQ-4 | WSL2 9p filesystem cache prevents Linux `npm` from seeing file changes on `/mnt/c/` | Resolved — for production builds, run `npm run build` via PowerShell: `powershell.exe -Command "cd C:\Users\marek\Projects\InventoryManagement\frontend; npm run build"`. For dev, Vite HMR works correctly through the Windows browser at `localhost:5173`. The Vite dev server runs in a persistent tmux session (`tmux new-session -d -s vite -c frontend 'npm run dev'`). |

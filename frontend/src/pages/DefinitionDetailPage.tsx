@@ -3,14 +3,13 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeftIcon, Pencil1Icon, TrashIcon, LockClosedIcon, Cross2Icon, PlusIcon } from '@radix-ui/react-icons'
 import { fetchDefinition, updateDefinition, deleteDefinition, updateOverrides } from '../api/definitions'
-import type { CreateFieldInput, DefinitionField, DefinitionDetail, OverrideInput } from '../api/definitions'
+import type { CreateFieldInput, OverrideInput } from '../api/definitions'
 import { fetchTags } from '../api/tags'
 import type { Tag } from '../api/tags'
 import { TagBadge } from '../components/tags/TagBadge'
+import { FieldEditor } from '../components/definitions/FieldEditor'
 import { useToast } from '../context/ToastContext'
 import styles from './DefinitionDetailPage.module.css'
-
-const FIELD_TYPES = ['text', 'number', 'boolean', 'date', 'enum'] as const
 
 export function DefinitionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -632,148 +631,4 @@ export function DefinitionDetailPage() {
   )
 }
 
-function FieldEditor({
-  field,
-  index,
-  total,
-  onChange,
-  onRemove,
-  onMoveUp,
-  onMoveDown,
-  showInheritedControls,
-}: {
-  field: CreateFieldInput
-  index: number
-  total: number
-  onChange: (updates: Partial<CreateFieldInput>) => void
-  onRemove: () => void
-  onMoveUp: () => void
-  onMoveDown: () => void
-  showInheritedControls: boolean
-}) {
-  return (
-    <div style={{
-      background: 'var(--color-bg-surface-alt)',
-      borderRadius: 'var(--radius-sm)',
-      padding: 'var(--space-lg)',
-      marginBottom: 'var(--space-md)',
-      border: '1px solid var(--color-border)',
-    }}>
-      <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
-        <div style={{ flex: 1 }}>
-          <label className={styles.formLabel}>Field Name</label>
-          <input
-            type="text"
-            value={field.field_name}
-            onChange={(e) => onChange({ field_name: e.target.value })}
-            className={styles.formInput}
-            style={{ width: '100%' }}
-            maxLength={100}
-          />
-        </div>
-        <div style={{ flex: 1 }}>
-          <label className={styles.formLabel}>Type</label>
-          <select
-            value={field.field_type}
-            onChange={(e) => onChange({ field_type: e.target.value as CreateFieldInput['field_type'] })}
-            className={styles.formInput}
-            style={{ width: '100%' }}
-          >
-            {FIELD_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      {field.field_type === 'enum' && (
-        <div style={{ marginBottom: 'var(--space-md)' }}>
-          <label className={styles.formLabel}>Enum Values (JSON array)</label>
-          <input
-            type="text"
-            value={Array.isArray(field.enum_values) ? JSON.stringify(field.enum_values) : ''}
-            onChange={(e) => {
-              try {
-                const parsed = JSON.parse(e.target.value)
-                if (Array.isArray(parsed)) {
-                  onChange({ enum_values: parsed })
-                }
-              } catch {
-                onChange({ enum_values: [] })
-              }
-            }}
-            className={styles.formInput}
-            style={{ width: '100%' }}
-            placeholder='["Option A", "Option B"]'
-          />
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
-        <label className={styles.formCheckbox}>
-          <input
-            type="checkbox"
-            checked={field.is_required}
-            onChange={(e) => onChange({ is_required: e.target.checked })}
-          />
-          Required
-        </label>
-        {showInheritedControls && (
-          <label className={styles.formCheckbox}>
-            <input
-              type="checkbox"
-              checked={field.is_child_editable}
-              onChange={(e) => onChange({ is_child_editable: e.target.checked })}
-            />
-            Child Editable
-          </label>
-        )}
-      </div>
-
-      <div style={{ marginBottom: 'var(--space-md)' }}>
-        <label className={styles.formLabel}>Default Value</label>
-        <input
-          type="text"
-          value={field.default_value ?? ''}
-          onChange={(e) => onChange({ default_value: e.target.value || null })}
-          className={styles.formInput}
-          style={{ width: '100%' }}
-        />
-      </div>
-
-      <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', gap: 'var(--space-xs)' }}>
-          <button
-            className={styles.smallButton}
-            onClick={onMoveUp}
-            disabled={index === 0}
-          >
-            Up
-          </button>
-          <button
-            className={styles.smallButton}
-            onClick={onMoveDown}
-            disabled={index === total - 1}
-          >
-            Down
-          </button>
-        </div>
-        <button
-          onClick={onRemove}
-          style={{
-            background: 'transparent',
-            color: 'var(--color-danger)',
-            border: '1px solid var(--color-danger)',
-            borderRadius: 'var(--radius-sm)',
-            padding: 'var(--space-xs) var(--space-md)',
-            font: 'var(--text-small)',
-            cursor: 'pointer',
-            minHeight: 36,
-          }}
-        >
-          Remove
-        </button>
-      </div>
-    </div>
-  )
-}

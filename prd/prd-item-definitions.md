@@ -187,7 +187,7 @@ Item Definitions are the "class" layer of the inventory system. They define *wha
 **Acceptance Criteria:**
 - [ ] Route `/definitions` renders a responsive list of all definitions.
 - [ ] Each row shows: name, unit (if set), tag badges (colored pills), total_instances count.
-- [ ] "Add Definition" button at top navigates to the create form.
+- [ ] "Add Definition" button toggles an inline creation form on the list page. The form supports setting name, description, unit, is_container, tags, and custom fields before creating.
 - [ ] Clicking a row navigates to `/definitions/:id` detail page.
 - [ ] Empty state: "No definitions yet" with call-to-action button.
 - [ ] Mobile: full-width list, tap rows to navigate.
@@ -424,9 +424,8 @@ r.Put("/{id}/overrides", definitionHandler.UpdateOverrides)
 ### 5.6 Frontend
 
 **FR-15:** Routes:
-- `/definitions` — `DefinitionListPage`
+- `/definitions` — `DefinitionListPage` (inline creation form toggled by "Add" button)
 - `/definitions/:id` — `DefinitionDetailPage`
-- `/definitions/new` — `DefinitionCreatePage` (or create via modal on list page)
 
 **FR-16:** TanStack Query keys:
 - `['definitions']` — flat list
@@ -440,7 +439,7 @@ r.Put("/{id}/overrides", definitionHandler.UpdateOverrides)
 - Tags tab: Tag assignment with search/dropdown
 - Instances tab: InstanceSummary component (read-only grouped list)
 
-**FR-19:** Field table renders:
+**FR-19:** Field editing is available in both the creation form (inline on list page) and the edit form (on detail page). A shared `FieldEditor` component supports:
 - Own fields: full edit controls (inline text inputs, type dropdown, toggles, delete button)
 - Inherited sealed fields: locked rows, greyed out, lock icon
 - Inherited overridable fields: locked rows except default_value cell (editable)
@@ -506,6 +505,6 @@ r.Put("/{id}/overrides", definitionHandler.UpdateOverrides)
 | # | Question | Status |
 |---|----------|--------|
 | OQ-1 | Should `field_name` collision check between own and inherited fields be case-insensitive? | Deferred to implementation — case-sensitive by default, revisit if user feedback demands it. |
-| OQ-2 | Should the create-definition form be a modal on the list page or a separate route? | Deferred to implementation. Recommend separate `/definitions/new` route for complex field/tag editing during creation. |
+| OQ-2 | Should the create-definition form be a modal on the list page or a separate route? | Resolved — inline form on `/definitions` list page with full field editing support. The creation form supports adding, configuring, reordering, and removing custom fields before submitting. |
 | OQ-3 | Should the field table auto-save each change or batch-save? | Resolved — batch save via explicit "Save Fields" button for v1. |
 | OQ-4 | Instance summary grouping: should "item inside item" instances (nested) be counted under the location or under the parent instance? | Deferred to PRD #8 (Item Instances). For the definition detail, count direct instances only grouped by `location_id`. |
