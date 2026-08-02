@@ -12,6 +12,10 @@ frontend/node_modules/
 frontend/dist/
 frontend/.vite/
 
+# Embedded frontend static copy
+cmd/server/static/*
+!cmd/server/static/.gitkeep
+
 # OS
 .DS_Store
 Thumbs.db

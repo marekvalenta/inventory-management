@@ -1,39 +1,31 @@
 package main
 
 import (
+	"embed"
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/marekvalenta/inventory-management/internal/config"
 	"github.com/marekvalenta/inventory-management/internal/db"
+	"github.com/marekvalenta/inventory-management/internal/router"
 )
 
+//go:embed all:static
+var embeddedFrontend embed.FS
+
 func main() {
-	port := os.Getenv("APP_PORT")
-	if port == "" {
-		port = "8080"
-	}
+	cfg := config.Load()
 
-	dataDir := os.Getenv("DATA_DIR")
-	if dataDir == "" {
-		dataDir = "./data"
-	}
-
-	database := db.Connect(dataDir)
+	database := db.Connect(cfg.DataDir)
 	defer database.Close()
 
 	db.RunMigrations(database)
 	db.AutoSeed(database)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /api/v1/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"status":"ok"}`))
-	})
+	r := router.New(embeddedFrontend)
 
-	log.Printf("inventory-management server starting on :%s", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	log.Printf("inventory-management server starting on :%s", cfg.Port)
+	if err := http.ListenAndServe(":"+cfg.Port, r); err != nil {
 		log.Fatalf("server failed: %v", err)
 	}
 }

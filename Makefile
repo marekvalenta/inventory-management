@@ -16,6 +16,9 @@ dev: check-air
 build:
 	@echo "-> Building frontend..."
 	npm run build --prefix $(FRONTEND_DIR)
+	@echo "-> Copying frontend build for embed..."
+	rm -rf cmd/server/static/*
+	cp -r frontend/dist/* cmd/server/static/
 	@echo "-> Building Go binary..."
 	mkdir -p bin
 	go build -o bin/$(BINARY_NAME) $(CMD_PATH)

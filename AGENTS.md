@@ -7,7 +7,7 @@
 ## 🚀 Workspace & Project Overview
 
 - **Project Name:** InventoryManagement
-- **Phase:** Implementation — foundational PRDs are being implemented. PRDs 1–2 are implemented; PRD 3 (backend architecture) is next.
+- **Phase:** Implementation — foundational PRDs are being implemented. PRDs 1–3 are implemented; PRD 4 (frontend architecture) is next.
 - **PRD Directory:** `prd/` (contains all feature specs: `prd/prd-[feature-name].md`)
 - **Custom Skills Directory:** `.agents/skills/`
 
@@ -33,7 +33,7 @@
 | 0 | `prd-overarching-architecture.md` | High-level architecture, tech stack, data model, testing strategy | ✅ Done |
 | 1 | `prd-project-setup.md` | Repo structure, Go module, Vite init, Makefile, README | ✅ Implemented |
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Implemented |
-| 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Done |
+| 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Implemented |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Done |
 | — | `prd-visual-design.md` | Complete visual design system — colors, typography, spacing, key page layouts, component states | ✅ Done |
 | 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Done |
