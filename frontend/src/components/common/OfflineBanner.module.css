@@ -1,0 +1,11 @@
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+  font: var(--text-caption);
+  gap: var(--space-sm);
+  user-select: none;
+}

@@ -1,0 +1,82 @@
+.shell {
+  display: flex;
+  min-height: 100svh;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-surface);
+  border-right: 1px solid var(--color-border);
+  user-select: none;
+  overflow-y: auto;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  height: 64px;
+  padding: 0 var(--space-lg);
+}
+
+.logoMark {
+  font: var(--text-h3);
+  color: var(--color-accent);
+}
+
+.logoText {
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-md) var(--space-lg);
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 var(--space-lg);
+  gap: var(--space-md);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font: var(--text-body-strong);
+  border-left: 3px solid transparent;
+  transition: background var(--transition-fast), color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navItem:hover {
+  background: var(--color-bg-surface-alt);
+}
+
+.navItemActive {
+  color: var(--color-accent);
+  background: var(--color-accent-muted);
+  border-left-color: var(--color-accent);
+}
+
+.main {
+  flex: 1;
+  margin-left: 240px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.main > * {
+  flex: 1;
+  padding: var(--space-2xl);
+  max-width: 960px;
+  width: 100%;
+  margin: 0 auto;
+}

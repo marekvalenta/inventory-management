@@ -1,0 +1,75 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  padding-bottom: 56px;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 var(--space-lg);
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border);
+  user-select: none;
+}
+
+.headerTitle {
+  font: var(--text-body-strong);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-lg);
+}
+
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  height: 56px;
+  background: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border);
+  user-select: none;
+}
+
+.navTab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 44px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: var(--text-caption);
+  gap: 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navTabActive {
+  color: var(--color-accent);
+  border-top: 2px solid var(--color-accent);
+  margin-top: -1px;
+}

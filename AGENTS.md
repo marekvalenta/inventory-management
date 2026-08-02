@@ -34,7 +34,7 @@
 | 1 | `prd-project-setup.md` | Repo structure, Go module, Vite init, Makefile, README | ✅ Implemented |
 | 2 | `prd-database-schema.md` | Full SQLite schema, migration system, WAL mode, startup runner | ✅ Implemented |
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Implemented |
-| 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Done |
+| 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Implemented |
 | — | `prd-visual-design.md` | Complete visual design system — colors, typography, spacing, key page layouts, component states | ✅ Done |
 | 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Done |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
