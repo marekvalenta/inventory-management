@@ -6,33 +6,24 @@ import (
 	"sort"
 )
 
-type BrowseInstance struct {
-	ID             string `json:"id"`
-	DefinitionID   string `json:"definition_id"`
-	DefinitionName string `json:"definition_name"`
-	Quantity       int    `json:"quantity"`
-	IsContainer    bool   `json:"is_container"`
-	ChildCount     int    `json:"child_count"`
-}
-
 type BrowseNode struct {
-	ID                string           `json:"id"`
-	Name              string           `json:"name"`
-	Description       *string          `json:"description"`
-	Kind              string           `json:"kind"`
-	Children          []BrowseNode     `json:"children"`
-	Instances         []BrowseInstance `json:"instances"`
-	InstanceCount     int              `json:"instance_count"`
-	InstanceTruncated bool             `json:"instance_truncated"`
+	ID             string        `json:"id"`
+	Name           string        `json:"name"`
+	Description    *string       `json:"description"`
+	Kind           string        `json:"kind"`
+	Children       []BrowseNode  `json:"children"`
+	Stacks         []BrowseStack `json:"stacks"`
+	StackCount     int           `json:"stack_count"`
+	StackTruncated bool          `json:"stack_truncated"`
 }
 
-type rawInstance struct {
-	ID             string
+type rawStack struct {
 	DefinitionID   string
 	DefinitionName string
-	Quantity       int
+	Unit           sql.NullString
 	IsContainer    bool
-	ChildCount     int
+	TotalQuantity  int
+	InstanceCount  int
 	LocationID     string
 }
 
@@ -41,9 +32,9 @@ type nodeAux struct {
 	name        string
 	description *string
 	parentID    *string
-	instances   []BrowseInstance
-	instCount   int
-	instTrunc   bool
+	stacks      []BrowseStack
+	stackCount  int
+	stackTrunc  bool
 	children    []string
 }
 
@@ -55,7 +46,7 @@ func NewBrowseService(db *sql.DB) *BrowseService {
 	return &BrowseService{db: db}
 }
 
-const browseInstanceLimit = 50
+const browseStackLimit = 50
 
 func (s *BrowseService) GetBrowse() ([]BrowseNode, error) {
 	nodeMap := make(map[string]*nodeAux)
@@ -105,62 +96,71 @@ func (s *BrowseService) GetBrowse() ([]BrowseNode, error) {
 		})
 	}
 
-	instRows, err := s.db.Query(`
-		SELECT i.id, i.definition_id, d.name, i.quantity, d.is_container,
-		       i.location_id,
-		       (SELECT COUNT(*) FROM item_instances WHERE parent_instance_id = i.id) as child_count
+	stackRows, err := s.db.Query(`
+		SELECT
+			i.location_id,
+			d.id AS definition_id,
+			d.name AS definition_name,
+			d.unit,
+			d.is_container,
+			COALESCE(SUM(i.quantity), 0) AS total_quantity,
+			COUNT(i.id) AS instance_count
 		FROM item_instances i
 		JOIN item_definitions d ON d.id = i.definition_id
 		WHERE i.location_id IS NOT NULL
+		GROUP BY i.location_id, d.id, i.parent_instance_id
 		ORDER BY i.location_id, d.name ASC
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("get browse instances: %w", err)
+		return nil, fmt.Errorf("get browse stacks: %w", err)
 	}
-	defer instRows.Close()
+	defer stackRows.Close()
 
-	var allInstances []rawInstance
-	for instRows.Next() {
-		var ri rawInstance
-		if err := instRows.Scan(&ri.ID, &ri.DefinitionID, &ri.DefinitionName, &ri.Quantity, &ri.IsContainer, &ri.LocationID, &ri.ChildCount); err != nil {
-			return nil, fmt.Errorf("scan browse instance: %w", err)
+	var allStacks []rawStack
+	for stackRows.Next() {
+		var rs rawStack
+		if err := stackRows.Scan(&rs.LocationID, &rs.DefinitionID, &rs.DefinitionName, &rs.Unit, &rs.IsContainer, &rs.TotalQuantity, &rs.InstanceCount); err != nil {
+			return nil, fmt.Errorf("scan browse stack: %w", err)
 		}
-		allInstances = append(allInstances, ri)
+		allStacks = append(allStacks, rs)
 	}
-	if err := instRows.Err(); err != nil {
+	if err := stackRows.Err(); err != nil {
 		return nil, err
 	}
 
-	perLocation := make(map[string][]rawInstance)
-	for _, ri := range allInstances {
-		perLocation[ri.LocationID] = append(perLocation[ri.LocationID], ri)
+	perLocation := make(map[string][]rawStack)
+	for _, rs := range allStacks {
+		perLocation[rs.LocationID] = append(perLocation[rs.LocationID], rs)
 	}
 
-	for locID, riList := range perLocation {
+	for locID, rsList := range perLocation {
 		node, ok := nodeMap[locID]
 		if !ok {
 			continue
 		}
-		total := len(riList)
-		truncated := total > browseInstanceLimit
+		total := len(rsList)
+		truncated := total > browseStackLimit
 		take := total
-		if take > browseInstanceLimit {
-			take = browseInstanceLimit
+		if take > browseStackLimit {
+			take = browseStackLimit
 		}
-		var insts []BrowseInstance
-		for _, ri := range riList[:take] {
-			insts = append(insts, BrowseInstance{
-				ID:             ri.ID,
-				DefinitionID:   ri.DefinitionID,
-				DefinitionName: ri.DefinitionName,
-				Quantity:       ri.Quantity,
-				IsContainer:    ri.IsContainer,
-				ChildCount:     ri.ChildCount,
-			})
+		var stacks []BrowseStack
+		for _, rs := range rsList[:take] {
+			stack := BrowseStack{
+				DefinitionID:   rs.DefinitionID,
+				DefinitionName: rs.DefinitionName,
+				TotalQuantity:  rs.TotalQuantity,
+				InstanceCount:  rs.InstanceCount,
+				IsContainer:    rs.IsContainer,
+			}
+			if rs.Unit.Valid {
+				stack.Unit = &rs.Unit.String
+			}
+			stacks = append(stacks, stack)
 		}
-		node.instances = insts
-		node.instCount = total
-		node.instTrunc = truncated
+		node.stacks = stacks
+		node.stackCount = total
+		node.stackTrunc = truncated
 	}
 
 	var buildNode func(nid string) BrowseNode
@@ -170,19 +170,19 @@ func (s *BrowseService) GetBrowse() ([]BrowseNode, error) {
 		for _, cid := range aux.children {
 			children = append(children, buildNode(cid))
 		}
-		insts := aux.instances
-		if insts == nil {
-			insts = []BrowseInstance{}
+		stacks := aux.stacks
+		if stacks == nil {
+			stacks = []BrowseStack{}
 		}
 		return BrowseNode{
-			ID:                aux.id,
-			Name:              aux.name,
-			Description:       aux.description,
-			Kind:              "location",
-			Children:          children,
-			Instances:         insts,
-			InstanceCount:     aux.instCount,
-			InstanceTruncated: aux.instTrunc,
+			ID:             aux.id,
+			Name:           aux.name,
+			Description:    aux.description,
+			Kind:           "location",
+			Children:       children,
+			Stacks:         stacks,
+			StackCount:     aux.stackCount,
+			StackTruncated: aux.stackTrunc,
 		}
 	}
 

@@ -41,6 +41,10 @@ func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 	dashboardHandler := handler.NewDashboardHandler(dashboardSvc)
 	browseSvc := service.NewBrowseService(db)
 	browseHandler := handler.NewBrowseHandler(browseSvc)
+	stackSvc := service.NewStackService(db)
+	stackHandler := handler.NewStackHandler(stackSvc)
+	searchSvc := service.NewSearchService(db)
+	searchHandler := handler.NewSearchHandler(searchSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
@@ -50,6 +54,13 @@ func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 		definitionHandler.RegisterRoutes(r)
 		instanceHandler.RegisterRoutes(r)
 		r.Get("/browse", browseHandler.Browse)
+		r.Get("/search", searchHandler.Search)
+		r.Route("/stacks", func(r chi.Router) {
+			r.Get("/", stackHandler.List)
+			r.Get("/detail", stackHandler.Detail)
+			r.Post("/move", stackHandler.Move)
+			r.Delete("/", stackHandler.Delete)
+		})
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -85,6 +96,10 @@ func NewTestRouter(db *sql.DB) chi.Router {
 	dashboardHandler := handler.NewDashboardHandler(dashboardSvc)
 	browseSvc := service.NewBrowseService(db)
 	browseHandler := handler.NewBrowseHandler(browseSvc)
+	stackSvc := service.NewStackService(db)
+	stackHandler := handler.NewStackHandler(stackSvc)
+	searchSvc := service.NewSearchService(db)
+	searchHandler := handler.NewSearchHandler(searchSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
@@ -94,6 +109,13 @@ func NewTestRouter(db *sql.DB) chi.Router {
 		definitionHandler.RegisterRoutes(r)
 		instanceHandler.RegisterRoutes(r)
 		r.Get("/browse", browseHandler.Browse)
+		r.Get("/search", searchHandler.Search)
+		r.Route("/stacks", func(r chi.Router) {
+			r.Get("/", stackHandler.List)
+			r.Get("/detail", stackHandler.Detail)
+			r.Post("/move", stackHandler.Move)
+			r.Delete("/", stackHandler.Delete)
+		})
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {

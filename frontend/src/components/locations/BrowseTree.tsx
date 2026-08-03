@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon, ArchiveIcon, CubeIcon } from '@radix-ui/react-icons'
 import { Link } from 'react-router-dom'
-import { fetchInstanceContents } from '../../api/instances'
-import type { BrowseNode, BrowseInstance } from '../../api/locations'
+import { fetchStacks } from '../../api/stacks'
+import type { BrowseStack } from '../../api/stacks'
+import type { BrowseNode } from '../../api/locations'
 import styles from './BrowseTree.module.css'
 
 interface BrowseTreeProps {
@@ -12,27 +13,33 @@ interface BrowseTreeProps {
   onAddInstance: (locationId: string | null, parentInstanceId: string | null) => void
 }
 
-function InstanceNode({
-  inst,
+function StackNode({
+  stack,
   depth,
+  locationId,
   onAddInstance,
 }: {
-  inst: BrowseInstance
+  stack: BrowseStack
   depth: number
+  locationId?: string | null
   onAddInstance: (parentInstanceId: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const hasLoaded = useHasLoaded()
 
-  const { data: contents } = useQuery({
-    queryKey: ['instances', inst.id, 'contents'],
-    queryFn: () => fetchInstanceContents(inst.id),
-    enabled: expanded && hasLoaded.current,
+  const { data: subStacksData } = useQuery({
+    queryKey: ['stacks', { parentInstanceId: stack.definition_id }],
+    queryFn: () => fetchStacks({ parent_instance_id: '' }),
+    enabled: false,
   })
 
-  const childInstances = contents?.instances ?? []
-  const isContainer = inst.is_container && inst.child_count > 0
-  const instanceIcon = isContainer ? <CubeIcon width={18} height={18} /> : <CubeIcon width={18} height={18} />
+  const isContainer = stack.is_container && stack.child_count > 0
+  const stackDetailParams = new URLSearchParams()
+  stackDetailParams.set('definition_id', stack.definition_id)
+  if (locationId) {
+    stackDetailParams.set('location_id', locationId)
+  }
+  const stackDetailUrl = `/stacks?${stackDetailParams.toString()}`
 
   return (
     <div className={styles.node}>
@@ -61,40 +68,37 @@ function InstanceNode({
             }}
           />
         </button>
-        <span className={styles.instanceIcon}>{instanceIcon}</span>
-        <Link to={`/instances/${inst.id}`} className={styles.name}>
-          {inst.definition_name}
+        <span className={styles.instanceIcon}>
+          <CubeIcon width={18} height={18} />
+        </span>
+        <Link to={stackDetailUrl} className={styles.name}>
+          {stack.definition_name}
         </Link>
-        <span className={styles.quantityBadge}>&times;{inst.quantity}</span>
+        <span className={styles.quantityBadge}>&times;{stack.total_quantity}</span>
+        <span className={styles.countLabel}>{stack.instance_count} instances</span>
         <button
           className={styles.addButton}
           onClick={(e) => {
             e.preventDefault()
-            onAddInstance(inst.id)
+            onAddInstance('')
           }}
-          aria-label={`Add item inside ${inst.definition_name}`}
+          aria-label={`Add item inside ${stack.definition_name}`}
           title="Add item"
         >
           <CubeIcon width={15} height={15} />
           Add
         </button>
       </div>
-      {expanded &&
-        childInstances.map((child) => (
-          <InstanceNode
-            key={child.id}
-            inst={{
-              id: child.id,
-              definition_id: child.definition_id,
-              definition_name: child.definition_name,
-              quantity: child.quantity,
-              is_container: false,
-              child_count: 0,
-            }}
+      {expanded && isContainer && (
+        subStacksData?.stacks?.map((sub) => (
+          <StackNode
+            key={`${sub.definition_id}-container`}
+            stack={sub}
             depth={depth + 1}
             onAddInstance={onAddInstance}
           />
-        ))}
+        ))
+      )}
     </div>
   )
 }
@@ -112,9 +116,9 @@ function LocationNode({
 }) {
   const [expanded, setExpanded] = useState(depth === 0)
 
-  const hasSubLocations = node.children.length > 0
-  const hasInstances = node.instances.length > 0
-  const hasContent = hasSubLocations || hasInstances
+  const hasSubLocations = (node.children ?? []).length > 0
+  const hasStacks = (node.stacks ?? []).length > 0
+  const hasContent = hasSubLocations || hasStacks
 
   return (
     <div className={styles.node}>
@@ -179,24 +183,25 @@ function LocationNode({
               onAddInstance={onAddInstance}
             />
           ))}
-          {hasSubLocations && hasInstances && (
+          {hasSubLocations && hasStacks && (
             <div className={styles.divider} style={{ paddingLeft: `${(depth + 1) * 1.5}rem` }} />
           )}
-          {node.instances.map((inst) => (
-            <InstanceNode
-              key={inst.id}
-              inst={inst}
+          {node.stacks.map((stack) => (
+            <StackNode
+              key={stack.definition_id}
+              stack={stack}
               depth={depth + 1}
+              locationId={node.id}
               onAddInstance={(parentId) => onAddInstance(null, parentId)}
             />
           ))}
-          {node.instance_truncated && (
+          {node.stack_truncated && (
             <div
               className={styles.truncatedHint}
               style={{ paddingLeft: `${(depth + 1) * 1.5}rem` }}
             >
               <Link to={`/locations/${node.id}`}>
-                +{node.instance_count - node.instances.length} more items
+                +{node.stack_count - node.stacks.length} more stacks
               </Link>
             </div>
           )}

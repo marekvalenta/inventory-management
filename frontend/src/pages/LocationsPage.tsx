@@ -101,7 +101,7 @@ export function LocationsPage() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.heading}>Locations</h1>
+        <h1 className={styles.heading}>Browse</h1>
         <button className={styles.createButton} onClick={handleAddRoot}>
           <PlusIcon width={20} height={20} />
           <span>Add Top-Level</span>

@@ -1,7 +1,7 @@
 # PRD: Locations — InventoryManagement
 
-> **Status:** Draft v2.0
-> **Scope:** Locations CRUD (API + UI), unified location+instance browse tree, container instance nesting, breadcrumb navigation, move/reparent with cycle detection, deletion guard.
+> **Status:** Implemented v2.0
+> **Scope:** Locations CRUD (API + UI), unified location+stack browse tree, item stack grouping per definition+parent, location detail page showing stacks (not flat instances), breadcrumb navigation, move/reparent with cycle detection, deletion guard.
 
 ---
 
@@ -13,6 +13,7 @@
 - `prd-backend-architecture.md` — Go layering (handler/service/db), chi router, error mapping, payload validation.
 - `prd-frontend-architecture.md` — CSS Modules, TanStack Query, React Router v6, Radix UI, mobile/desktop layouts.
 - `prd-project-setup.md` — Makefile targets, test commands, directory structure (not directly impacted).
+- `prd-item-stacks.md` — Item Stack concept, stack API, stack-level move/delete. Browse tree and browse endpoint updated to show stacks instead of individual instances.
 
 ### Conflicts & Resolutions
 
@@ -20,6 +21,7 @@
 |---|---|---|---|
 | 1 | Overarching §4.2 describes a "Delete all?" prompt implying cascade, but `prd-database-schema.md` enforces `ON DELETE RESTRICT`. | prd-overarching-architecture.md, prd-database-schema.md | This PRD adopts **hard block (RESTRICT)**. No cascade delete. UI shows error with counts of blocking children/items. Overarching PRD updated to reflect RESTRICT enforcement. |
 | 2 | Root location behavior undefined — database PRD auto-seeds it but doesn't specify mutability rules. | prd-database-schema.md | Root location is **special**: cannot be deleted or reparented, but **can be renamed**. Root is identified via `settings.root_location_id`. |
+| 3 | `prd-item-stacks.md` defines Item Stacks as the primary grouping for browse tree display. Browse tree US-007 and browse endpoint US-010 previously showed individual `BrowseInstance` rows. | `prd-item-stacks.md` | **Updated to use stacks.** Browse tree shows `StackNode` (one row per definition+parent pair). Browse endpoint returns `stacks: BrowseStack[]` instead of `instances: BrowseInstance[]`. Clicking navigates to `/stacks?definition_id=X&location_id=Y`. Container children lazy-loaded via `/stacks?parent_instance_id=Y`. |
 | - | `root_location_id` was not in the initial database PRD schema. | prd-database-schema.md | **Resolved:** `root_location_id TEXT REFERENCES locations(id)` is included in the initial migration defined in `prd-database-schema.md`. No additional change needed. |
 
 ### Confirmed Alignments
@@ -36,7 +38,7 @@
 
 Locations are the hierarchical backbone of the inventory system. They represent physical or logical places where items are stored. A location can contain sub-locations (unlimited depth) and item instances. This PRD defines the full CRUD API, the tree browser UI, and the guard rails (deletion blocking, cycle prevention on move/reparent, breadcrumb navigation).
 
-**v2 (Unified Tree):** The location tree page (`/locations`) is upgraded from a locations-only tree to a **unified browse tree** showing both locations and item instances. Container instances are expandable to show nested child instances. Two action buttons per tree node allow adding sub-locations and instances directly from the tree. This replaces the v1 non-goal that kept instances out of the tree.
+**v2 (Unified Tree):** The location tree page (`/locations`) is upgraded from a locations-only tree to a **unified browse tree** showing both locations and item stacks (grouped instances by definition + parent). Container stacks are expandable to show nested child stacks. Two action buttons per tree node allow adding sub-locations and instances directly from the tree. This replaces the v1 non-goal that kept instances out of the tree. **v3 (Item Stacks):** Individual instances are further grouped into stacks — see `prd-item-stacks.md`.
 
 ### Core Deliverables
 1. REST API: Create, read, update, delete, list, tree, children, contents, breadcrumb.
@@ -141,23 +143,23 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 - [ ] A location with no parent returns a single-element breadcrumb (itself).
 - [ ] Typecheck / build / test suite passes.
 
-### US-007: Unified Browse Tree (UI) — Locations + Instances
-**Description:** As a user, I want a visual tree browser showing both locations and item instances together so I can see my entire inventory structure in one view. This replaces the v1 locations-only tree.
+### US-007: Unified Browse Tree (UI) — Locations + Item Stacks
+**Description:** As a user, I want a visual tree browser showing both locations and item stacks together so I can see my entire inventory structure in one view. **Item Stacks** group all instances of the same definition at the same parent (location or container) into a single row, showing total quantity. See `prd-item-stacks.md` for the full stack concept.
 
 **Acceptance Criteria:**
 - [ ] Tree page (`/locations`) loads the full tree upfront via `GET /api/v1/browse`.
-- [ ] Tree nodes are mixed: locations (archive icon) and instances (cube icon) rendered under each location.
-- [ ] **Grouping:** Under each expanded location, sub-locations render first, then a subtle divider, then instances below.
-- [ ] Each location node is clickable → navigates to `/locations/:id`. Each instance node is clickable → navigates to `/instances/:id`.
-- [ ] Instance nodes show a quantity badge (e.g., "×5") to the right of the name.
-- [ ] Container instances (those with `is_container = true` and `child_count > 0`) display a chevron and are expandable. Expanding a container instance lazy-loads child instances via `GET /api/v1/instances/:id/contents`.
-- [ ] Non-container instances show no expand toggle.
-- [ ] **Instance capping:** Maximum 50 instances shown per location. If truncated, a "(+N more)" link appears below the visible instances, linking to `/locations/:id` (the Location Detail page).
+- [ ] Tree nodes are mixed: locations (archive icon) and stacks (cube icon) rendered under each location.
+- [ ] **Grouping:** Under each expanded location, sub-locations render first, then a subtle divider, then stacks below. Each stack row represents ALL instances of the same definition at that location — regardless of field value differences.
+- [ ] Each location node is clickable → navigates to `/locations/:id`. Each stack node is clickable → navigates to `/stacks?definition_id=X&location_id=Y` (or `&parent_instance_id=Y` for container-nested stacks).
+- [ ] Stack nodes show total quantity badge (e.g., "×300") and instance count ("15 instances") to the right of the name.
+- [ ] Container stacks (those with `is_container = true` and `child_count > 0`) display a chevron and are expandable. Expanding a container stack lazy-loads child stacks via `GET /api/v1/stacks?parent_instance_id=Y`.
+- [ ] Non-container stacks show no expand toggle.
+- [ ] **Stack capping:** Maximum 50 stacks shown per location. If truncated, a "(+N more)" link appears below the visible stacks, linking to `/locations/:id` (the Location Detail page).
 - [ ] **Two action buttons** per location node: "+" archive icon → opens CreateEditModal for a new sub-location (existing behavior); "+" cube icon → opens CreateInstanceModal with the location pre-filled as `location_id`.
-- [ ] **Two action buttons** per container instance node: "+" cube icon → opens CreateInstanceModal with the container instance pre-filled as `parent_instance_id`. No location-add button on instance nodes.
+- [ ] **One action button** per container stack node: "+" cube icon → opens CreateInstanceModal with the container instance pre-filled as `parent_instance_id`. No location-add button on stack nodes.
 - [ ] Mobile: full-width tree, indentation shows hierarchy, tap to expand/collapse, 44×44px touch targets for expand and action buttons.
 - [ ] Desktop: indent markers, hover states, larger spacing between groups.
-- [ ] Empty state: if only the root location exists with no instances, show "No locations or items yet — tap + to add" prompt.
+- [ ] Empty state: if only the root location exists with no stacks, show "No locations or items yet — tap + to add" prompt.
 - [ ] **[UI]** Verified in browser on both 375px and 1920px viewports.
 
 ### US-008: Create/Edit Location Form (UI)
@@ -184,27 +186,28 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 - [ ] Delete button on the root location is hidden/disabled with a tooltip: "Root location cannot be deleted."
 - [ ] **[UI]** Verified in browser.
 
-### US-010: Unified Browse Endpoint (API)
-**Description:** As the frontend, I need a single endpoint that returns the full location tree with instances attached to each node so the unified browse tree can render on initial load.
+### US-010: Unified Browse Endpoint (API) — Locations + Item Stacks
+**Description:** As the frontend, I need a single endpoint that returns the full location tree with item stacks attached to each node so the unified browse tree can render on initial load. Stacks group all instances of the same definition at the same parent into one entry. See `prd-item-stacks.md` for the full stack concept.
 
 **Acceptance Criteria:**
-- [ ] `GET /api/v1/browse` returns the full nested location tree with `instances` array on each location node.
-- [ ] Each location node has `kind: "location"`, recursive `children` (sub-locations), and `instances` array.
-- [ ] Each instance entry includes: `id`, `definition_id`, `definition_name`, `quantity`, `is_container`, `child_count`.
-- [ ] Instances are capped at **50 per location** node. When capped, `instance_truncated: true` and `instance_count` reflects the total (untruncated) count.
-- [ ] Instance `child_count` reflects the number of child instances inside a container (0 for non-containers). The container's children are NOT recursively expanded in the browse response — they are loaded on demand via `/instances/:id/contents`.
-- [ ] Locations and instances are sorted alphabetically by name (locations first, then instances grouped after).
-- [ ] Container instances at root-level (i.e., instances with `location_id` = root and `is_container = true`) are included in the root location's `instances` array.
+- [ ] `GET /api/v1/browse` returns the full nested location tree with `stacks` array on each location node.
+- [ ] Each location node has `kind: "location"`, recursive `children` (sub-locations), and `stacks` array.
+- [ ] Each stack entry includes: `definition_id`, `definition_name`, `unit`, `total_quantity`, `instance_count`, `is_container`, `child_count`.
+- [ ] Stacks are capped at **50 per location** node. When capped, `stack_truncated: true` and `stack_count` reflects the total (untruncated) count of stacks (not individual instances).
+- [ ] Stack `child_count` reflects the number of child instances inside container instances of that stack (0 for non-containers). The container's children are NOT recursively expanded — they are loaded on demand via `/stacks?parent_instance_id=Y`.
+- [ ] Locations and stacks are sorted alphabetically by name (locations first, then stacks grouped after).
+- [ ] Container instances at root-level (i.e., instances with `location_id` = root and `is_container = true`) are grouped into stacks within the root location's `stacks` array.
+- [ ] The previous `instances` array and `BrowseInstance` type are removed — replaced by `stacks` (array of `BrowseStack`). See `prd-item-stacks.md` FR-1 for the `BrowseStack` schema.
 - [ ] Typecheck / build / test suite passes.
 
 ### US-011: Instance Management from Tree (UI)
-**Description:** As a user, I want to create new instances directly from the browse tree without navigating to a detail page.
+**Description:** As a user, I want to create new instances directly from the browse tree without navigating to a detail page. Created instances automatically merge into the appropriate stack.
 
 **Acceptance Criteria:**
 - [ ] "+" cube icon on a location node opens `CreateInstanceModal` with `location_id` pre-filled.
-- [ ] "+" cube icon on a container instance node opens `CreateInstanceModal` with `parent_instance_id` pre-filled.
-- [ ] After successful creation, the tree node's instance list is invalidated and re-fetched (via TanStack Query invalidation of `['locations', 'tree-instances', locationId]`).
-- [ ] Successful creation shows a success toast. Failed creation shows an error toast.
+- [ ] "+" cube icon on a container stack node opens `CreateInstanceModal` with `parent_instance_id` pre-filled.
+- [ ] After successful creation, the tree node's stack list is invalidated and re-fetched (via TanStack Query invalidation of `['stacks', { locationId }]` or `['browse']`).
+- [ ] Successful creation shows a success toast with updated stack total. Failed creation shows an error toast.
 - [ ] **[UI]** Verified in browser.
 
 ---
@@ -326,46 +329,49 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
         "description": "...",
         "kind": "location",
         "children": [],
-        "instances": [
+        "stacks": [
           {
-            "id": "inst-uuid",
             "definition_id": "...",
             "definition_name": "Box of Screws",
-            "quantity": 1,
+            "unit": "pcs",
+            "total_quantity": 15,
+            "instance_count": 3,
             "is_container": true,
             "child_count": 3
           }
         ],
-        "instance_count": 12,
-        "instance_truncated": false
+        "stack_count": 12,
+        "stack_truncated": false
       }
     ],
-    "instances": [],
-    "instance_count": 0,
-    "instance_truncated": false
+    "stacks": [],
+    "stack_count": 0,
+    "stack_truncated": false
   }
 ]
 ```
 
 **Implementation details:**
-- Built from flat `locations` table (same two-pass algorithm as `GetTree()`) but augmented with instance data per node.
-- Instances per location are fetched with `LIMIT 51` (50 + 1 to detect truncation). Sorted alphabetically by `definition_name`.
-- `instance_truncated` = `true` when more than 50 instances exist at a location. `instance_count` = total unfiltered count.
-- `is_container` and `child_count` come from the item definition (`is_container` field) and a subquery counting child instances.
-- Container instance children are NOT recursively expanded — the frontend lazy-loads them via `/instances/:id/contents`.
-- Only instances with a direct `location_id` (not `parent_instance_id`) are included at each location node.
+- Built from flat `locations` table (same two-pass algorithm as `GetTree()`) but augmented with stack data per node.
+- Stacks per location are computed via `GROUP BY definition_id, location_id, parent_instance_id` on `item_instances`. Limited to 51 (50 + 1 to detect truncation). Sorted alphabetically by `definition_name`.
+- `stack_truncated` = `true` when more than 50 stacks exist at a location. `stack_count` = total unfiltered stack count (not individual instance count).
+- `total_quantity` = SUM of all instance quantities in the stack. `instance_count` = COUNT of individual instance rows in the stack.
+- `is_container` and `child_count` come from the item definition (`is_container` field) and a subquery summing child instances across the stack's instances.
+- Container stack children are NOT recursively expanded — the frontend lazy-loads them via `GET /api/v1/stacks?parent_instance_id=Y`.
+- Only instances with a direct `location_id` (not `parent_instance_id`) are included in `stacks` at each location node. Container-nested instances are grouped under their container's stack.
 
 ### 5.3 Frontend
 
 **FR-9:** Use TanStack Query with hierarchical keys:
-- `['browse']` — unified full tree (locations + instances).
+- `['browse']` — unified full tree (locations + stacks).
 - `['locations']` — flat list.
 - `['locations', 'tree']` — full tree (locations only).
 - `['locations', id]` — single location.
 - `['locations', id, 'children']` — direct children.
 - `['locations', id, 'contents']` — contents.
 - `['locations', id, 'breadcrumb']` — breadcrumb.
-- `['locations', id, 'instances']` — instances at a location (lazy-loaded on expand).
+- `['stacks', { locationId }]` — stacks at a location (lazy-loaded on expand).
+- `['stacks', { parentInstanceId }]` — stacks inside a container (lazy-loaded on expand).
 
 **FR-10:** On any successful mutation (create/update/delete), invalidate `['browse']`, `['locations']` and related keys. Use targeted invalidation — don't invalidate the entire tree if only one node changed.
 
@@ -374,15 +380,15 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 - All descendants of the location being edited (prevents cycles)
 - (Optional optimization: fetch the full tree and filter client-side)
 
-**FR-12:** Unified browse tree (`LocationTree` / `BrowseTree` component):
-- Initial load via `GET /api/v1/browse` — full tree with locations + capped instances.
-- On expand of a location node: lazy-load instances (if truncated) via `GET /api/v1/instances?location_id=:id&limit=50`.
-- On expand of a container instance node: lazy-load child instances via `GET /api/v1/instances/:id/contents`.
-- Node types: location (archive icon), container instance (cube icon, expandable), non-container instance (cube icon, leaf).
-- Grouping: under each location, sub-locations render first (from `children`), then instances (from `instances` array).
+**FR-12:** Unified browse tree (`BrowseTree` component):
+- Initial load via `GET /api/v1/browse` — full tree with locations + capped stacks.
+- On expand of a location node: lazy-load stacks (if truncated) via `GET /api/v1/stacks?location_id=:id`.
+- On expand of a container stack node: lazy-load child stacks via `GET /api/v1/stacks?parent_instance_id=:id`.
+- Node types: location (archive icon), container stack (cube icon, expandable), non-container stack (cube icon, leaf).
+- Grouping: under each location, sub-locations render first (from `children`), then stacks (from `stacks` array).
 - Two action buttons per location node: +archive-icon → create sub-location modal, +cube-icon → create instance modal.
-- One action button per container instance node: +cube-icon → create instance modal (inside container).
-- Expanded state is tracked locally in component state. Lazy-loaded instance data is cached by TanStack Query.
+- One action button per container stack node: +cube-icon → create instance modal (inside container).
+- Expanded state is tracked locally in component state. Lazy-loaded stack data is cached by TanStack Query via `['stacks']` keys.
 
 **FR-13:** All forms use HTML5 validation as first line + controlled component validation before submit.
 
@@ -415,8 +421,8 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 - **Creating locations from instance pages:** Locations are created within locations only, never within items.
 - **Search within location tree:** Deferred to PRD #10 (Search).
 - **Location images/photos:** Deferred to future photo attachment feature.
-- **Recursive item instance contents in browse endpoint:** The `/browse` endpoint does NOT recursively expand container instance children. Container children are lazy-loaded on expand via `/instances/:id/contents`.
-- **Recursive item instance contents in `/contents`:** `contents` returns direct instances only. Recursive item-in-item resolution is PRD #8.
+- **Recursive item stack contents in browse endpoint:** The `/browse` endpoint does NOT recursively expand container stack children. Container children are lazy-loaded on expand via `GET /api/v1/stacks?parent_instance_id=Y`.
+- **Individual instance display in browse tree:** The browse tree shows stacks (grouped by definition + parent), not individual instances. Individual instances are accessible via the stack detail page (`/stacks?definition_id=X&location_id=Y`) or individual instance detail (`/instances/:id`).
 
 ---
 

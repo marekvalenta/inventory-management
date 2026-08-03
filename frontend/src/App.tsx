@@ -10,6 +10,7 @@ import { LocationDetailPage } from './pages/LocationDetailPage'
 import { DefinitionListPage } from './pages/DefinitionListPage'
 import { DefinitionDetailPage } from './pages/DefinitionDetailPage'
 import { InstanceDetailPage } from './pages/InstanceDetailPage'
+import { StackDetailPage } from './pages/StackDetailPage'
 import { TagsPage } from './pages/TagsPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { HomePage } from './pages/HomePage'
@@ -33,6 +34,7 @@ function App() {
                 <Route path="definitions" element={<DefinitionListPage />} />
                 <Route path="definitions/:id" element={<DefinitionDetailPage />} />
                 <Route path="instances/:id" element={<InstanceDetailPage />} />
+                <Route path="stacks" element={<StackDetailPage />} />
                 <Route path="tags" element={<TagsPage />} />
                 <Route path="settings" element={<HomePage />} />
                 <Route path="*" element={<NotFoundPage />} />

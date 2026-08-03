@@ -7,7 +7,7 @@
 ## 🚀 Workspace & Project Overview
 
 - **Project Name:** InventoryManagement
-- **Phase:** Implementation — foundational PRDs are being implemented. PRDs 1–7 are implemented; PRD 8 (item-instances) is next.
+- **Phase:** Implementation — foundational PRDs are being implemented. PRDs 1–14 are now implemented.
 - **PRD Directory:** `prd/` (contains all feature specs: `prd/prd-[feature-name].md`)
 - **Custom Skills Directory:** `.agents/skills/`
 
@@ -36,15 +36,16 @@
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Implemented |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Implemented |
 | — | `prd-visual-design.md` | Complete visual design system — colors, typography, spacing, key page layouts, component states | ✅ Done |
-| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard → **v2: unified browse tree with instances** | 🔄 In Progress |
+| 5 | `prd-locations.md` | Locations CRUD — API + UI, unified browse tree with stacks, location detail showing stacks, deletion guard | ✅ Implemented |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Implemented |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Implemented |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Implemented |
 | 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | ✅ Done |
 | 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | ✅ Done |
 | 11 | `prd-dashboard.md` | Dashboard — totals, location breakdown, search bar, onboarding | ✅ Implemented |
-| 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | ✅ Done |
-| 13 | `prd-settings.md` | Settings page — UI + backend, theme selector, typed-struct extensibility, app renamed to Itema | ✅ Done |
+| 12 | `prd-search.md` | Name-based search v1 — API + UI, extensible for filters later | ✅ Implemented |
+| 13 | `prd-settings.md` | Settings page — UI + backend, theme selector, typed-struct extensibility, app renamed to Itema | ✅ Implemented |
+| 14 | `prd-item-stacks.md` | Item Stacks — UI-level grouping, stack detail page, stack move/delete, browse tree + search integration | ✅ Implemented |
 
 ### Status Key
 - ✅ Implemented — PRD written, approved, and fully implemented (all code + tests)

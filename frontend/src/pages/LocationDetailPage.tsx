@@ -8,6 +8,7 @@ import {
   CubeIcon,
   ArchiveIcon,
 } from '@radix-ui/react-icons'
+import { fetchStacks } from '../api/stacks'
 import {
   fetchLocation,
   fetchLocationContents,
@@ -54,6 +55,12 @@ export function LocationDetailPage() {
   const { data: contents, isLoading: contentsLoading } = useQuery({
     queryKey: ['locations', id, 'contents'],
     queryFn: () => fetchLocationContents(id!),
+    enabled: !!id,
+  })
+
+  const { data: stacksData } = useQuery({
+    queryKey: ['stacks', { location_id: id }],
+    queryFn: () => fetchStacks({ location_id: id! }),
     enabled: !!id,
   })
 
@@ -221,28 +228,36 @@ export function LocationDetailPage() {
             Add Item
           </button>
         </div>
-        {contentsLoading ? (
-          <div className={styles.loading}>Loading...</div>
-        ) : contents?.instances && contents.instances.length > 0 ? (
+        {stacksData?.stacks && stacksData.stacks.length > 0 ? (
           <div className={styles.instanceList}>
-            {contents.instances.map((inst) => (
-              <a
-                key={inst.id}
-                href={`/instances/${inst.id}`}
-                className={styles.instanceItem}
-                onClick={(e) => {
-                  e.preventDefault()
-                  navigate(`/instances/${inst.id}`)
-                }}
-              >
-                <span className={styles.instanceName}>
-                  {inst.definition_name}
-                </span>
-                <span className={styles.instanceQuantity}>
-                  x{inst.quantity}
-                </span>
-              </a>
-            ))}
+            {stacksData.stacks.map((stack) => {
+              const params = new URLSearchParams()
+              params.set('definition_id', stack.definition_id)
+              params.set('location_id', id!)
+              return (
+                <a
+                  key={stack.definition_id}
+                  href={`/stacks?${params.toString()}`}
+                  className={styles.instanceItem}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    navigate(`/stacks?${params.toString()}`)
+                  }}
+                >
+                  <span className={styles.instanceName}>
+                    {stack.definition_name}
+                  </span>
+                  <div className={styles.stackMeta}>
+                    <span className={styles.instanceQuantity}>
+                      x{stack.total_quantity}
+                    </span>
+                    <span className={styles.countLabel}>
+                      {stack.instance_count} instance{stack.instance_count !== 1 ? 's' : ''}
+                    </span>
+                  </div>
+                </a>
+              )
+            })}
           </div>
         ) : (
           <p className={styles.empty}>No items in this location</p>

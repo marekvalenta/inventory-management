@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import type { BrowseStack } from './stacks'
 
 export interface Location {
   id: string
@@ -38,24 +39,15 @@ export interface DeleteBlock {
   instance_count: number
 }
 
-export interface BrowseInstance {
-  id: string
-  definition_id: string
-  definition_name: string
-  quantity: number
-  is_container: boolean
-  child_count: number
-}
-
 export interface BrowseNode {
   id: string
   name: string
   description: string | null
   kind: 'location'
   children: BrowseNode[]
-  instances: BrowseInstance[]
-  instance_count: number
-  instance_truncated: boolean
+  stacks: BrowseStack[]
+  stack_count: number
+  stack_truncated: boolean
 }
 
 export interface CreateLocationRequest {

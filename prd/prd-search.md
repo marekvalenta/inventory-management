@@ -1,7 +1,7 @@
 # PRD: Search — InventoryManagement
 
 > **Status:** Done v1.0
-> **Scope:** Name-based search across locations, definitions, and instances. Persistent header search bar on all pages, quick-results dropdown, full search results page with entity type filtering, and database indexes for LIKE performance.
+> **Scope:** Name-based search across locations, definitions, and item stacks. Persistent header search bar on all pages, quick-results dropdown, full search results page with entity type filtering, and database indexes for LIKE performance.
 
 ---
 
@@ -17,6 +17,7 @@
 - `prd-locations.md` — Location CRUD, tree, contents, breadcrumb.
 - `prd-item-definitions.md` — Definition CRUD, field resolution, instances summary.
 - `prd-item-instances.md` — Instance CRUD, move/split, breadcrumb, container nesting.
+- `prd-item-stacks.md` — Item Stack concept, stack API, stack detail page. Search results return stacks (grouped by definition+parent) instead of individual instances. Clicking a stack search result navigates to `/stacks?definition_id=X&location_id=Y`.
 - `prd-tags.md` — Tag CRUD (no search over tags in v1).
 - `prd-testing.md` — Integration test patterns, seed data.
 - `prd-docker-deployment.md` — No direct impact.
@@ -33,6 +34,7 @@
 | 6 | Item instances have no `name` column — search works via definition name JOIN. | `prd-database-schema.md` | Instance search queries `item_instances` JOIN `item_definitions` on `definition_id`, matching against `item_definitions.name`. |
 | 7 | Overarching §11 says FTS5 is a v2 non-goal. §12 says API must be extensible to support it. | `prd-overarching-architecture.md` | v1 uses SQL `LIKE '%term%'`. The API design (`?q=` query param, entity-type grouping, paginated results) is compatible with a future FTS5 backend swap — only the service implementation changes, not the request/response contract. |
 | 8 | Persistent header search bar on every page conflicts with the dashboard's prominent centered search bar. Two search bars on one page is redundant. | `prd-dashboard.md` | **Dashboard page suppresses the header search bar.** The dashboard has its own prominent, centered search bar (per `prd-dashboard.md` US-005). On the dashboard route `/`, the header search bar (mobile icon + desktop input) is hidden. On all other routes, the header search bar is visible. The `SearchBar` component is shared — both the dashboard's centered variant and the header's inline variant use the same `SearchBar` component with different `variant` props. |
+| 9 | Search returned individual instance entries. `prd-item-stacks.md` requires search to return stacks (grouped by definition+parent) instead — one result per definition+location pair with total quantity. | `prd-item-stacks.md` | **Changed `instances[]` to `stacks[]`** in the search response. Each stack result includes `definition_id`, `definition_name`, `unit`, `location_id`, `location_name`, `parent_instance_id`, `parent_instance_name`, `total_quantity`, `instance_count`. Multiple instances of the same definition at the same location merge to one search result. `total_counts.instances` renamed to `total_counts.stacks`. Quick-results dropdown and search results page show stack rows instead of instance rows. Clicking navigates to `/stacks?...`. |
 
 ### Confirmed Alignments
 - Data model: All queries are read-only against existing tables (`locations`, `item_definitions`, `item_instances`). One schema change: new migration with indexes.
@@ -126,16 +128,16 @@ Users need to quickly find locations, item definitions, and/or item instances by
 - [ ] Top 3 results per entity type, grouped into sections with headers:
   - **Locations (N):** 3 location rows from `GET /api/v1/search?q=term&limit=3`
   - **Definitions (N):** 3 definition rows
-  - **Instances (N):** 3 instance rows
+  - **Stacks (N):** 3 stack rows
   - `N` = total matching count for that type (from `total_counts` in API response).
 - [ ] Each section header: `--text-caption`, `--color-text-secondary`, uppercase, padded.
 - [ ] Each result row shows:
-  - Entity type icon (16x16px): archive for locations, clipboard for definitions, cube for instances.
+  - Entity type icon (16x16px): archive for locations, clipboard for definitions, cube for stacks.
   - Entity name (`--text-body-strong`).
-  - Subtitle line (`--text-caption`, `--color-text-secondary`): location → parent location name (if not root); definition → unit (if set); instance → "xQTY — in LocationName".
+  - Subtitle line (`--text-caption`, `--color-text-secondary`): location → parent location name (if not root); definition → unit (if set); stack → "x300 total — 15 instances — in LocationName".
 - [ ] If a section has 0 results, the section is hidden entirely.
 - [ ] A "Show all results..." link is present at the bottom of the dropdown (even when all sections are collapsed, "Show all results for 'term'" is shown), navigating to `/search?q=<term>`.
-- [ ] Clicking any result row navigates to the entity's detail page (`/locations/:id`, `/definitions/:id`, `/instances/:id`) and closes the dropdown.
+- [ ] Clicking any result row navigates to the entity's detail page (`/locations/:id`, `/definitions/:id`, `/stacks?definition_id=X&location_id=Y`) and closes the dropdown.
 - [ ] Keyboard navigation: Arrow Up/Down moves highlight through result rows. Enter selects the highlighted result. Escape closes the dropdown.
 - [ ] TanStack Query key: `['search', { q, limit: 3 }]` with `staleTime: 10_000`, `enabled: q.length >= 2`.
 - [ ] **[UI]** Verified in browser.
@@ -148,15 +150,15 @@ Users need to quickly find locations, item definitions, and/or item instances by
 - [ ] Query parameter `?q=` is read from the URL. If `q` is empty or missing, the page shows a prompt: "Enter a search term to find items." with a focused search input.
 - [ ] The search input at the top of the page is pre-filled with the query and auto-focused. It mirrors the header search bar — typing here updates the URL and triggers a new search.
 - [ ] Below the search input: entity type tabs:
-  - **Tab bar:** `[All (24)] [Locations (3)] [Definitions (5)] [Instances (16)]` — counts from `total_counts` in API response.
+  - **Tab bar:** `[All (24)] [Locations (3)] [Definitions (5)] [Stacks (16)]` — counts from `total_counts` in API response.
   - Active tab: bg `--color-accent-muted`, text `--color-accent`, bottom border 2px `--color-accent`.
   - Inactive tab: text `--color-text-secondary`, hover bg `--color-bg-surface-alt`.
   - Default active tab: "All" (shows grouped results).
   - Selecting a specific type tab shows a flat list of only that type's results (sorted by match relevance, descending).
-  - Tabs update the URL: `/search?q=term` (All), `/search?q=term&type=locations`, `/search?q=term&type=definitions`, `/search?q=term&type=instances`.
+  - Tabs update the URL: `/search?q=term` (All), `/search?q=term&type=locations`, `/search?q=term&type=definitions`, `/search?q=term&type=stacks`.
 - [ ] **"All" tab — grouped view:**
   - Sections for each entity type with counts, same as dropdown but with ALL matching results (no cap).
-  - Section headers: "Locations (3)", "Definitions (5)", "Instances (16)" — `--text-h3`.
+  - Section headers: "Locations (3)", "Definitions (5)", "Stacks (16)" — `--text-h3`.
   - Results in card rows (bg `--color-bg-surface`, `--radius-sm`, padding `--space-lg`, margin-bottom `--space-sm`).
   - Each card navigates to the entity's detail page on click/tap.
   - If a type has 0 results, its section is hidden.
@@ -174,16 +176,16 @@ Users need to quickly find locations, item definitions, and/or item instances by
 - [ ] **[UI]** Verified in browser on both 375px and 1920px viewports.
 
 ### US-005: Search API Endpoint
-**Description:** As a frontend, I want a single search endpoint that returns matching locations, definitions, and instances, with optional type filtering and result limiting.
+**Description:** As a frontend, I want a single search endpoint that returns matching locations, definitions, and item stacks, with optional type filtering and result limiting.
 
 **Acceptance Criteria:**
 - [ ] `GET /api/v1/search?q=term` returns JSON with the structure defined in FR-2.
 - [ ] Query params:
   - `q` — required, search term (2–200 chars).
-  - `type` — optional, filter to entity type: `"all"` (default), `"locations"`, `"definitions"`, `"instances"`.
+  - `type` — optional, filter to entity type: `"all"` (default), `"locations"`, `"definitions"`, `"stacks"`.
   - `limit` — optional, integer. Caps results per group. Omit or 0 = unlimited (subject to max 100 per group).
 - [ ] Invalid `q` (< 2 chars or empty) returns `400 Bad Request` with `{"error": "Search term must be at least 2 characters", "code": "invalid_query"}`.
-- [ ] Invalid `type` returns `400 Bad Request` with `{"error": "Invalid type: 'xyz'. Valid types: all, locations, definitions, instances", "code": "invalid_type"}`.
+- [ ] Invalid `type` returns `400 Bad Request` with `{"error": "Invalid type: 'xyz'. Valid types: all, locations, definitions, stacks", "code": "invalid_type"}`.
 - [ ] Invalid `limit` (negative, non-integer) returns `400 Bad Request`.
 - [ ] When `type=all` (or omitted): response includes all three groups plus `total_counts`.
 - [ ] When `type=locations` (or specific type): response includes only that group, no other groups, still includes `total_counts` for all types (so the tabs show accurate counts).
@@ -260,9 +262,8 @@ No other schema changes. No new tables, no new columns.
       "parent_def_name": "Screw or null"
     }
   ],
-  "instances": [
+  "stacks": [
     {
-      "id": "uuid",
       "definition_id": "uuid",
       "definition_name": "M3 Screw",
       "unit": "pcs or null",
@@ -270,13 +271,14 @@ No other schema changes. No new tables, no new columns.
       "location_name": "Workshop or null",
       "parent_instance_id": "uuid or null",
       "parent_instance_name": "Toolbox or null",
-      "quantity": 50
+      "total_quantity": 300,
+      "instance_count": 15
     }
   ],
   "total_counts": {
     "locations": 3,
     "definitions": 5,
-    "instances": 12
+    "stacks": 12
   }
 }
 ```
@@ -284,15 +286,17 @@ No other schema changes. No new tables, no new columns.
 - `locations[].parent_name`: resolved from the parent location. `null` for root location or top-level.
 - `definitions[].parent_def_name`: resolved from parent definition. `null` for root definitions.
 - `definitions[].unit`: `null` if not set.
-- `instances[].definition_name`: always present (via JOIN on `item_definitions`).
-- `instances[].unit`: from the definition. `null` if not set.
-- `instances[].location_name`: resolved from `location_id`. `null` if instance is placed inside a container.
-- `instances[].parent_instance_name`: resolved from `parent_instance_id`. Format: `"definition_name (xQTY)"`. `null` if instance is directly at a location.
+- `stacks[].definition_name`: always present (via JOIN on `item_definitions`).
+- `stacks[].unit`: from the definition. `null` if not set.
+- `stacks[].total_quantity`: SUM of all individual instance quantities in the stack.
+- `stacks[].instance_count`: COUNT of individual instance rows in the stack.
+- `stacks[].location_name`: resolved from `location_id`. `null` if stack is inside a container.
+- `stacks[].parent_instance_name`: resolved from `parent_instance_id`. Format: `"definition_name"`. `null` if stack is directly at a location.
 - `total_counts` always reflects total matches per type, ignoring `limit`. When `type` is specified, the non-matching groups are omitted from the response body BUT their `total_counts` entries are still present.
 
-**FR-3:** When `type=all` (or omitted), `locations`, `definitions`, and `instances` arrays are all present in the response.
+**FR-3:** When `type=all` (or omitted), `locations`, `definitions`, and `stacks` arrays are all present in the response.
 
-**FR-4:** When `type=locations` (or `definitions` or `instances`), only the matching array is present. The other two arrays are omitted from the response. `total_counts` always includes all three keys regardless.
+**FR-4:** When `type=locations` (or `definitions` or `stacks`), only the matching array is present. The other two arrays are omitted from the response. `total_counts` always includes all three keys regardless.
 
 ```json
 // type=definitions
@@ -301,7 +305,7 @@ No other schema changes. No new tables, no new columns.
   "total_counts": {
     "locations": 3,
     "definitions": 5,
-    "instances": 12
+    "stacks": 12
   }
 }
 ```
@@ -340,21 +344,25 @@ ORDER BY
 LIMIT ?
 ```
 
-Instances:
+Stacks (grouped by definition + location/parent):
 ```sql
 SELECT
-  i.id, i.definition_id, d.name AS definition_name, d.unit,
-  i.location_id, l.name AS location_name,
-  i.parent_instance_id,
-  pi_def.name AS parent_instance_def_name,
-  pi.quantity AS parent_instance_qty,
-  i.quantity
+    d.id AS definition_id,
+    d.name AS definition_name,
+    d.unit,
+    i.location_id,
+    l.name AS location_name,
+    i.parent_instance_id,
+    pi_def.name AS parent_instance_name,
+    COALESCE(SUM(i.quantity), 0) AS total_quantity,
+    COUNT(i.id) AS instance_count
 FROM item_instances i
 JOIN item_definitions d ON d.id = i.definition_id
 LEFT JOIN locations l ON l.id = i.location_id
 LEFT JOIN item_instances pi ON pi.id = i.parent_instance_id
 LEFT JOIN item_definitions pi_def ON pi_def.id = pi.definition_id
 WHERE d.name LIKE '%' || ? || '%'
+GROUP BY d.id, i.location_id, i.parent_instance_id
 ORDER BY
   CASE
     WHEN d.name = ? THEN 0
@@ -382,21 +390,33 @@ type SearchService struct {
 
 type SearchParams struct {
     Query string
-    Type  string // "all", "locations", "definitions", "instances"
+    Type  string // "all", "locations", "definitions", "stacks"
     Limit int    // 0 = default cap (100)
 }
 
 type SearchResponse struct {
     Locations    []LocationResult    `json:"locations,omitempty"`
     Definitions  []DefinitionResult  `json:"definitions,omitempty"`
-    Instances    []InstanceResult    `json:"instances,omitempty"`
+    Stacks       []StackResult       `json:"stacks,omitempty"`
     TotalCounts  TotalCounts         `json:"total_counts"`
 }
 
 type TotalCounts struct {
     Locations   int `json:"locations"`
     Definitions int `json:"definitions"`
-    Instances   int `json:"instances"`
+    Stacks      int `json:"stacks"`
+}
+
+type StackResult struct {
+    DefinitionID       string  `json:"definition_id"`
+    DefinitionName     string  `json:"definition_name"`
+    Unit               *string `json:"unit"`
+    LocationID         *string `json:"location_id"`
+    LocationName       *string `json:"location_name"`
+    ParentInstanceID   *string `json:"parent_instance_id"`
+    ParentInstanceName *string `json:"parent_instance_name"`
+    TotalQuantity      int     `json:"total_quantity"`
+    InstanceCount      int     `json:"instance_count"`
 }
 ```
 
@@ -406,7 +426,7 @@ type TotalCounts struct {
 3. Compute `total_counts` first (3 lightweight COUNT queries, always run).
 4. If `type=all` or `type=locations`: execute locations query.
 5. If `type=all` or `type=definitions`: execute definitions query.
-6. If `type=all` or `type=instances`: execute instances query.
+6. If `type=all` or `type=stacks`: execute stacks query.
 7. Assemble and return response.
 
 **FR-11:** Validation:
@@ -460,7 +480,7 @@ interface SearchBarProps {
 ```
 <SearchResultsPage>
   <SearchBar variant="page" />        ← pre-filled with q, updates URL on submit
-  <TypeTabs />                         ← [All (24)] [Locations (3)] [Definitions (5)] [Instances (16)]
+  <TypeTabs />                         ← [All (24)] [Locations (3)] [Definitions (5)] [Stacks (16)]
   {type === 'all' ? (
     <GroupedResults />                 ← sections for each type with full result lists
   ) : (
@@ -480,12 +500,12 @@ interface SearchBarProps {
 **FR-19:** Result cards in both dropdown and page views are clickable `<Link>` components:
 - Location → `/locations/:id`
 - Definition → `/definitions/:id`
-- Instance → `/instances/:id`
+- Stack → `/stacks?definition_id=X&location_id=Y`
 
 **FR-20:** Entity type badges (used in result cards):
 
 ```
-[L] Location    [D] Definition    [I] Instance
+[L] Location    [D] Definition    [S] Stack
 ```
 
 - 16x16px icon + 2-char abbreviation
@@ -514,7 +534,7 @@ interface SearchBarProps {
 | Search term is 1 character | Frontend: query disabled. Input does not trigger search. Backend: if called directly, returns `400 Bad Request`. |
 | Search term contains SQL special characters (`%`, `_`, `'`) | Parameterized queries prevent injection. Wildcard characters in `q` are treated as literal characters by the application — they're embedded inside the `LIKE '%term%'` pattern, so `%` and `_` have their LIKE wildcard meaning (this is intentional — searching for "%" would match everything, but that's an edge case the user is unlikely to hit). |
 | Search term is very long (200+ characters) | Frontend limits input to 200 chars. Backend validates: > 200 chars → `400 Bad Request`. |
-| Zero matches across all entity types | API returns `locations: [], definitions: [], instances: [], total_counts: { locations: 0, definitions: 0, instances: 0 }`. Frontend shows "No results for 'term'" empty state. |
+| Zero matches across all entity types | API returns `locations: [], definitions: [], stacks: [], total_counts: { locations: 0, definitions: 0, stacks: 0 }`. Frontend shows "No results for 'term'" empty state. |
 | `type` parameter is invalid | Backend returns `400 Bad Request` with valid types listed. Frontend: tabs control the `type` param so invalid values shouldn't occur from UI. URL tampering → error state. |
 | `limit` parameter is negative or non-integer | Backend returns `400 Bad Request`. Frontend controls `limit` (always 3 for dropdown, unset for page). |
 | Rapid typing triggers many API calls | Frontend debounces at 300ms. TanStack Query cancels previous in-flight queries for the same key. Only the latest query completes. |
@@ -523,9 +543,9 @@ interface SearchBarProps {
 | User navigates to `/search?q=term` directly (bookmark) | Page loads, fetches search results for `term`, displays them. TanStack Query fetches on mount. |
 | User clears the search input on the results page | URL updates to `/search`, query is disabled, page shows prompt. |
 | Root location matches a search term | Root location ("Home") is included in location search results. Clicking navigates to `/locations/:root_id`. This is fine — the user might want to navigate to root. |
-| Instance with `parent_instance_id` set (nested in a container) appears in search results | Instance result shows: `"location_name": null, "parent_instance_name": "Toolbox (x2)"`. The user clicks → navigates to `/instances/:id` which has its own breadcrumb. |
-| Multiple instances of the same definition in different locations match the search term | Each instance appears as a separate result row. Sorted by match quality then alphabetically by `definition_name`. Instances with the same name are distinguished by their location/container subtitle. |
-| Definition has many matching instances (e.g., 200 "M3 Screw" instances distributed across 50 locations) | All matching instances are returned (subject to the 100-per-group cap). Instance results include distinct `id`, `location_name`, and `quantity` so the user can pick the right one. |
+| Stack with `parent_instance_id` set (nested in a container) appears in search results | Stack result shows: `"location_name": null, "parent_instance_name": "Toolbox"`. The user clicks → navigates to `/stacks?definition_id=X&parent_instance_id=Y`. |
+| Multiple stacks of the same definition in different locations match the search term | Each stack appears as a separate result row (one per definition+location pair). Sorted by match quality then alphabetically by `definition_name`. Stacks with the same name are distinguished by their location/container subtitle. |
+| Definition has many matching stacks (e.g., "M3 Screw" distributed across 50 locations, with multiple individual instances at each) | Each location gets one stack result showing `total_quantity` and `instance_count`. Results are capped at 100 stacks per group. Stack results are grouped by `definition_id + location_id + parent_instance_id` — the user sees one row per location, not one row per individual instance. |
 | Search results page is opened on mobile with keyboard visible | Page layout accommodates the keyboard. Search bar stays visible at top. Results scroll beneath. |
 | Database indexes fail to create (migration error) | Migration fails on startup, container exits with error. Same behavior as any failed migration per database PRD. |
 
@@ -537,7 +557,7 @@ interface SearchBarProps {
 - **Advanced filters:** No filtering by tags, location, quantity range, date range, container status, or field values. Entity type is the only filter.
 - **Relevance ranking beyond simple tiering:** v1 uses exact → starts-with → contains sorting. No TF-IDF, no Levenshtein/fuzzy matching, no result scoring.
 - **Search within a specific location or container:** Search is global across all entities. No contextual "search inside this location."
-- **Search by instance field values:** Instance search matches against `item_definitions.name` only, not field values (e.g., searching for "Steel" to find instances with Material=Steel is not supported).
+- **Search by instance field values:** Stack search matches against `item_definitions.name` only, not field values (e.g., searching for "Steel" to find stacks with Material=Steel instances is not supported).
 - **Search history or recent searches:** No client-side or server-side search history.
 - **Autocomplete suggestions:** No "did you mean?" or term suggestions from the database. The quick dropdown shows *results*, not query suggestions.
 - **Highlighted matching text in results:** Result names are not highlighted with bold or colored matched substrings in v1.

@@ -143,11 +143,12 @@ Four primary entity types:
 
 - **Locations are definitions only** — a Room is just a Room. No "instances" of a location exist.
 - **Definition inheritance** — a child definition inherits the field schema from its parent and may add new fields.
-- **Smart quantity merging** — identical items (same definition, same field values, same parent) share one instance record with a merged `quantity`. When any field value diverges, they become separate instances.
+- **Smart quantity merging (DB-level)** — identical items (same definition, same field values, same parent) share one instance record with a merged `quantity`. When any field value diverges, they become separate instances.
+- **Item Stacks (UI-level grouping)** — instances sharing the same definition and parent (location or container) are grouped into an "Item Stack" at the UI and API level, regardless of field value differences. This is a query-time aggregation — no DB table exists for stacks. Browse tree, search results, and location contents display stacks, not individual instances. Individual instance detail pages remain accessible as drill-down. Full spec in `prd-item-stacks.md`.
 - **Container nesting** — definitions can be marked `is_container`, allowing their instances to contain other instances (item-in-item). Only container instances can act as parents.
-- **Move/split** — instances can be partially moved with transaction safety, auto-merging at target. Full logic in `prd-item-instances.md`.
+- **Move/split** — instances can be partially moved with transaction safety, auto-merging at target. Stack-level move (arbitrary instance selection) is also supported. Full logic in `prd-item-instances.md` and `prd-item-stacks.md`.
 - **Tags** — flexible many-to-many labeling of item definitions (e.g. "Fasteners", "Fragile"). Defined in `prd-tags.md`.
-- **Deletion guards** — locations, definitions, and container-like instances with children cannot be deleted (hard block, FK `ON DELETE RESTRICT`, HTTP 409). Tags used by definitions can be deleted with user confirmation; associated definition_tags rows cascade via `ON DELETE CASCADE` — the user is warned how many definitions will be affected before proceeding.
+- **Deletion guards** — locations, definitions, and container-like instances with children cannot be deleted (hard block, FK `ON DELETE RESTRICT`, HTTP 409). Tags used by definitions can be deleted with user confirmation; associated definition_tags rows cascade via `ON DELETE CASCADE` — the user is warned how many definitions will be affected before proceeding. Stacks can be bulk-deleted (all instances in the stack) with type-to-confirm in the UI.
 
 ### 4.3 Entity Relationship Summary
 
@@ -184,6 +185,7 @@ settings (singleton row)
 | Locations | `/api/v1/locations` | CRUD, get tree, get contents |
 | Item Definitions | `/api/v1/definitions` | CRUD, get with fields, get instances |
 | Item Instances | `/api/v1/instances` | CRUD, move (with split logic), get by location |
+| Item Stacks | `/api/v1/stacks` | List grouped instances, stack detail, stack-level move, bulk delete |
 | Tags | `/api/v1/tags` | CRUD |
 | Search | `/api/v1/search` | v1: name search; future: full-text + filters |
 | Settings | `/api/v1/settings` | Read/write UI settings (stored in SQLite) |
@@ -200,14 +202,16 @@ All routes are under `/api/v1/`. Future breaking changes go to `/api/v2/`. Old v
 ### 6.1 Key Views (v1)
 
 | View | Purpose |
-|---|---|
+|---|---|---|
 | **Dashboard** | Total item counts, recent activity, quick search bar |
 | **Location Tree** | Hierarchical browser of all locations and their contents |
-| **Location Detail** | Contents of a specific location (sub-locations + instances) |
+| **Location Detail** | Contents of a specific location (sub-locations + item stacks) |
+| **Item Stack Detail** | All instances of the same definition at the same location/container grouped together, with drill-down to individual instances |
+| **Item Instance Detail** | Specific instance, field values, parent chain (breadcrumb to root location) |
 | **Item Definition List** | Browse/search all definitions, filterable by tags |
 | **Item Definition Detail** | Definition info, field schema, all instances + quantities per location, total quantity |
-| **Item Instance Detail** | Specific instance, field values, parent chain (breadcrumb to root location) |
 | **Settings** | App name and UI preferences |
+| **Search Results** | Full-page search results grouped by entity type (stacks, locations, definitions) |
 
 ### 6.2 Mobile-First Constraints
 
@@ -351,6 +355,7 @@ Even though the above are non-goals for v1, the architecture must not block them
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Done |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Done |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Done |
+| 14 | `prd-item-stacks.md` | Item Stacks — UI-level grouping, stack detail page, stack move/delete, browse tree + search integration | ✅ Done |
 | 9 | `prd-testing.md` | Full test plan — flows, seed data, Go integration tests, Playwright E2E | 🔲 Planned |
 | 10 | `prd-docker-deployment.md` | Multi-stage Dockerfile, docker-compose, health check, NAS deploy guide | 🔲 Planned |
 | 11 | `prd-dashboard.md` | Dashboard — totals, location breakdown, quick search bar | ✅ Done |

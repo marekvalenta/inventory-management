@@ -11,24 +11,25 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type browseInstanceResponse struct {
-	ID             string `json:"id"`
-	DefinitionID   string `json:"definition_id"`
-	DefinitionName string `json:"definition_name"`
-	Quantity       int    `json:"quantity"`
-	IsContainer    bool   `json:"is_container"`
-	ChildCount     int    `json:"child_count"`
+type browseStackResponse struct {
+	DefinitionID   string  `json:"definition_id"`
+	DefinitionName string  `json:"definition_name"`
+	Unit           *string `json:"unit"`
+	TotalQuantity  int     `json:"total_quantity"`
+	InstanceCount  int     `json:"instance_count"`
+	IsContainer    bool    `json:"is_container"`
+	ChildCount     int     `json:"child_count"`
 }
 
 type browseNodeResponse struct {
-	ID                string                   `json:"id"`
-	Name              string                   `json:"name"`
-	Description       *string                  `json:"description"`
-	Kind              string                   `json:"kind"`
-	Children          []browseNodeResponse     `json:"children"`
-	Instances         []browseInstanceResponse `json:"instances"`
-	InstanceCount     int                      `json:"instance_count"`
-	InstanceTruncated bool                     `json:"instance_truncated"`
+	ID             string                 `json:"id"`
+	Name           string                 `json:"name"`
+	Description    *string                `json:"description"`
+	Kind           string                 `json:"kind"`
+	Children       []browseNodeResponse   `json:"children"`
+	Stacks         []browseStackResponse  `json:"stacks"`
+	StackCount     int                    `json:"stack_count"`
+	StackTruncated bool                   `json:"stack_truncated"`
 }
 
 func TestBrowse(t *testing.T) {
@@ -39,7 +40,7 @@ func TestBrowse(t *testing.T) {
 	server := testutil.NewTestServer(t, db)
 	defer server.Close()
 
-	t.Run("returns empty instances for new root", func(t *testing.T) {
+	t.Run("returns empty stacks for new root", func(t *testing.T) {
 		resp := doRequest(t, server.URL, "GET", "/api/v1/browse", "")
 		defer resp.Body.Close()
 
@@ -51,9 +52,9 @@ func TestBrowse(t *testing.T) {
 		require.Len(t, nodes, 1)
 		require.Equal(t, "Home", nodes[0].Name)
 		require.Equal(t, "location", nodes[0].Kind)
-		require.Len(t, nodes[0].Instances, 0)
-		require.Equal(t, 0, nodes[0].InstanceCount)
-		require.False(t, nodes[0].InstanceTruncated)
+		require.Len(t, nodes[0].Stacks, 0)
+		require.Equal(t, 0, nodes[0].StackCount)
+		require.False(t, nodes[0].StackTruncated)
 	})
 
 	var livingRoomID string
@@ -93,7 +94,7 @@ func TestBrowse(t *testing.T) {
 
 	var boxDefID string
 
-	t.Run("creates definitions for browse instances", func(t *testing.T) {
+	t.Run("creates definitions for browse stacks", func(t *testing.T) {
 		resp := doRequest(t, server.URL, "POST", "/api/v1/definitions",
 			`{"name":"Tool Box","unit":"pcs","is_container":true}`)
 		defer resp.Body.Close()
@@ -108,7 +109,7 @@ func TestBrowse(t *testing.T) {
 		require.Equal(t, http.StatusCreated, resp.StatusCode)
 	})
 
-	t.Run("browse shows instances at locations", func(t *testing.T) {
+	t.Run("browse shows stacks at locations", func(t *testing.T) {
 		resp := doRequest(t, server.URL, "POST", "/api/v1/instances",
 			`{"definition_id":"`+boxDefID+`","quantity":2,"location_id":"`+livingRoomID+`"}`)
 		defer resp.Body.Close()
@@ -134,28 +135,18 @@ func TestBrowse(t *testing.T) {
 			}
 		}
 		require.NotNil(t, livingRoom)
-		require.Equal(t, 1, livingRoom.InstanceCount)
-		require.False(t, livingRoom.InstanceTruncated)
-		require.Len(t, livingRoom.Instances, 1)
-		require.Equal(t, "Tool Box", livingRoom.Instances[0].DefinitionName)
-		require.Equal(t, 2, livingRoom.Instances[0].Quantity)
-		require.True(t, livingRoom.Instances[0].IsContainer)
-		require.Equal(t, 0, livingRoom.Instances[0].ChildCount)
+		require.Equal(t, 1, livingRoom.StackCount)
+		require.False(t, livingRoom.StackTruncated)
+		require.Len(t, livingRoom.Stacks, 1)
+		require.Equal(t, "Tool Box", livingRoom.Stacks[0].DefinitionName)
+		require.Equal(t, 2, livingRoom.Stacks[0].TotalQuantity)
+		require.Equal(t, 1, livingRoom.Stacks[0].InstanceCount)
+		require.True(t, livingRoom.Stacks[0].IsContainer)
 	})
 
-	t.Run("browse shows container child count", func(t *testing.T) {
-		var boxInstID string
-
+	t.Run("browse shows stacks grouped by definition", func(t *testing.T) {
 		resp := doRequest(t, server.URL, "POST", "/api/v1/instances",
 			`{"definition_id":"`+boxDefID+`","quantity":1,"location_id":"`+livingRoomID+`"}`)
-		defer resp.Body.Close()
-		require.Equal(t, http.StatusCreated, resp.StatusCode)
-		var inst map[string]interface{}
-		json.NewDecoder(resp.Body).Decode(&inst)
-		boxInstID = inst["id"].(string)
-
-		resp = doRequest(t, server.URL, "POST", "/api/v1/instances",
-			`{"definition_id":"`+boxDefID+`","quantity":3,"parent_instance_id":"`+boxInstID+`"}`)
 		defer resp.Body.Close()
 		require.Equal(t, http.StatusCreated, resp.StatusCode)
 
@@ -168,19 +159,18 @@ func TestBrowse(t *testing.T) {
 		err := json.NewDecoder(resp.Body).Decode(&nodes)
 		require.NoError(t, err)
 
-		var boxInst *browseInstanceResponse
+		var livingRoom *browseNodeResponse
 		for i := range nodes[0].Children {
 			if nodes[0].Children[i].Name == "Living Room" {
-				for j := range nodes[0].Children[i].Instances {
-					if nodes[0].Children[i].Instances[j].ChildCount > 0 {
-						boxInst = &nodes[0].Children[i].Instances[j]
-						break
-					}
-				}
+				livingRoom = &nodes[0].Children[i]
+				break
 			}
 		}
-		require.NotNil(t, boxInst)
-		require.Equal(t, 1, boxInst.ChildCount)
-		require.True(t, boxInst.IsContainer)
+		require.NotNil(t, livingRoom)
+		require.Equal(t, 1, livingRoom.StackCount)
+		require.Len(t, livingRoom.Stacks, 1)
+		require.Equal(t, "Tool Box", livingRoom.Stacks[0].DefinitionName)
+		require.Equal(t, 3, livingRoom.Stacks[0].TotalQuantity)
+		require.Equal(t, 1, livingRoom.Stacks[0].InstanceCount)
 	})
 }

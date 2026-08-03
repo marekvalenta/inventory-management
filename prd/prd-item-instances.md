@@ -15,6 +15,7 @@
 - `prd-locations.md` — Breadcrumb CTE (reusable), contents endpoint pattern, deletion guard pattern (RESTRICT).
 - `prd-item-definitions.md` — Field resolution, field type validation (enforced here), `instances_summary` structure, definition detail page.
 - `prd-tags.md` — Tags apply to definitions only (no conflict).
+- `prd-item-stacks.md` — Item Stack concept providing UI-level grouping of instances by definition+parent. Stacks are a query-time aggregation layer above individual instances. Individual instance CRUD, move/split, and breadcrumb endpoints remain unchanged. Stack-level operations (list, detail, move, bulk delete) complement individual instance operations.
 
 ### Conflicts & Resolutions
 
@@ -42,6 +43,8 @@
 ## 1. Overview & Problem Statement
 
 Item Instances are the physical record layer of the inventory system. While Item Definitions define *what* a thing is, Instances represent *where and how many* of it exist. Instances track quantity, location/container placement, and field values specific to each occurrence. They support smart quantity merging, partial move/split operations, and container nesting (item-in-item, e.g., a Box of Screws). Every instance resolves to a full root-to-instance breadcrumb for at-a-glance location context.
+
+**Complementary layer: Item Stacks** — See `prd-item-stacks.md`. Item Stacks group multiple instances of the same definition at the same parent into a single UI row. The browse tree, search results, and `/stacks` detail page operate at the stack level. Individual instance pages (`/instances/:uuid`) remain accessible as drill-down from stack detail. This PRD defines the individual instance operations that underpins all stack operations.
 
 ### Core Deliverables
 1. REST API: Create (with auto-merge), read (with field values + breadcrumb), update, delete (guarded), partial move/split (transactional), list with filters, container contents, breadcrumb.

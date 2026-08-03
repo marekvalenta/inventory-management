@@ -131,6 +131,17 @@
   border-radius: var(--radius-full);
 }
 
+.stackMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.countLabel {
+  font: var(--text-caption);
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 639px) {
   .header {
     flex-direction: column;
