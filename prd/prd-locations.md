@@ -1,7 +1,7 @@
 # PRD: Locations — InventoryManagement
 
-> **Status:** Draft v1.0
-> **Scope:** Locations CRUD (API + UI), hierarchical tree browser, breadcrumb navigation, move/reparent with cycle detection, deletion guard.
+> **Status:** Draft v2.0
+> **Scope:** Locations CRUD (API + UI), unified location+instance browse tree, container instance nesting, breadcrumb navigation, move/reparent with cycle detection, deletion guard.
 
 ---
 
@@ -36,12 +36,16 @@
 
 Locations are the hierarchical backbone of the inventory system. They represent physical or logical places where items are stored. A location can contain sub-locations (unlimited depth) and item instances. This PRD defines the full CRUD API, the tree browser UI, and the guard rails (deletion blocking, cycle prevention on move/reparent, breadcrumb navigation).
 
+**v2 (Unified Tree):** The location tree page (`/locations`) is upgraded from a locations-only tree to a **unified browse tree** showing both locations and item instances. Container instances are expandable to show nested child instances. Two action buttons per tree node allow adding sub-locations and instances directly from the tree. This replaces the v1 non-goal that kept instances out of the tree.
+
 ### Core Deliverables
 1. REST API: Create, read, update, delete, list, tree, children, contents, breadcrumb.
-2. Server-side cycle detection on reparent.
-3. Hard-block deletion when children or item instances exist.
-4. Special root location handling (auto-seeded, non-deletable, non-reparentable, renamable).
-5. Frontend: tree browser, location detail, create/edit form, delete guard dialog.
+2. **NEW** `GET /api/v1/browse` endpoint returning the full unified tree (locations + instances).
+3. Server-side cycle detection on reparent.
+4. Hard-block deletion when children or item instances exist.
+5. Special root location handling (auto-seeded, non-deletable, non-reparentable, renamable).
+6. Frontend: unified browse tree, location detail, create/edit form, delete guard dialog.
+7. Instance display in tree with quantity badges, container nesting, and per-node action buttons.
 
 ---
 
@@ -93,13 +97,14 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 - [ ] Non-existent location returns `404 Not Found`.
 - [ ] Typecheck / build / test suite passes.
 
-### US-003: List All Locations & Tree
-**Description:** As a user, I want to browse the full location hierarchy so I understand my inventory's structure at a glance.
+### US-003: List All Locations & Browse Tree
+**Description:** As a user, I want to browse the full location hierarchy with item instances visible inline so I understand my inventory's structure at a glance.
 
 **Acceptance Criteria:**
 - [ ] `GET /api/v1/locations` returns a flat list of all locations (name, id, parent_id). Accepts optional `?parent_id=` filter.
 - [ ] `GET /api/v1/locations/tree` returns the entire nested hierarchy from all root nodes down, with each node containing `id`, `name`, `description`, and `children` array.
 - [ ] `GET /api/v1/locations/:id/children` returns flat array of direct children only (no nesting).
+- [ ] **NEW** `GET /api/v1/browse` returns the full tree with locations + instances mixed in. See US-010 for details.
 - [ ] Tree and list endpoints sorted alphabetically by `name` ascending.
 - [ ] Typecheck / build / test suite passes.
 
@@ -136,16 +141,23 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 - [ ] A location with no parent returns a single-element breadcrumb (itself).
 - [ ] Typecheck / build / test suite passes.
 
-### US-007: Location Tree Browser (UI)
-**Description:** As a user, I want a visual tree browser to explore my location hierarchy on both mobile and desktop.
+### US-007: Unified Browse Tree (UI) — Locations + Instances
+**Description:** As a user, I want a visual tree browser showing both locations and item instances together so I can see my entire inventory structure in one view. This replaces the v1 locations-only tree.
 
 **Acceptance Criteria:**
-- [ ] Tree renders as expandable/collapsible nested list using the `/tree` or `/children` endpoint (lazy load on expand).
-- [ ] Each tree node shows the location name. Tapping/clicking navigates to the location detail view.
-- [ ] "+" button on each node opens the create-location form with that node pre-selected as parent.
-- [ ] Mobile: full-width tree, indentation shows hierarchy, tap to expand/collapse.
-- [ ] Desktop: tree in sidebar or left panel, indent markers, hover states.
-- [ ] Empty state: if only the root location exists, show "No locations yet — tap + to add" prompt.
+- [ ] Tree page (`/locations`) loads the full tree upfront via `GET /api/v1/browse`.
+- [ ] Tree nodes are mixed: locations (folder icon) and instances (box/tag icon) rendered under each location.
+- [ ] **Grouping:** Under each expanded location, sub-locations render first, then a subtle divider, then instances below.
+- [ ] Each location node is clickable → navigates to `/locations/:id`. Each instance node is clickable → navigates to `/instances/:id`.
+- [ ] Instance nodes show a quantity badge (e.g., "×5") to the right of the name.
+- [ ] Container instances (those with `is_container = true` and `child_count > 0`) display a chevron and are expandable. Expanding a container instance lazy-loads child instances via `GET /api/v1/instances/:id/contents`.
+- [ ] Non-container instances show no expand toggle.
+- [ ] **Instance capping:** Maximum 50 instances shown per location. If truncated, a "(+N more)" link appears below the visible instances, linking to `/locations/:id` (the Location Detail page).
+- [ ] **Two action buttons** per location node: "+" folder icon → opens CreateEditModal for a new sub-location (existing behavior); "+" box icon → opens CreateInstanceModal with the location pre-filled as `location_id`.
+- [ ] **Two action buttons** per container instance node: "+" box icon → opens CreateInstanceModal with the container instance pre-filled as `parent_instance_id`. No location-add button on instance nodes.
+- [ ] Mobile: full-width tree, indentation shows hierarchy, tap to expand/collapse, 44×44px touch targets for expand and action buttons.
+- [ ] Desktop: indent markers, hover states, larger spacing between groups.
+- [ ] Empty state: if only the root location exists with no instances, show "No locations or items yet — tap + to add" prompt.
 - [ ] **[UI]** Verified in browser on both 375px and 1920px viewports.
 
 ### US-008: Create/Edit Location Form (UI)
@@ -172,6 +184,29 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 - [ ] Delete button on the root location is hidden/disabled with a tooltip: "Root location cannot be deleted."
 - [ ] **[UI]** Verified in browser.
 
+### US-010: Unified Browse Endpoint (API)
+**Description:** As the frontend, I need a single endpoint that returns the full location tree with instances attached to each node so the unified browse tree can render on initial load.
+
+**Acceptance Criteria:**
+- [ ] `GET /api/v1/browse` returns the full nested location tree with `instances` array on each location node.
+- [ ] Each location node has `kind: "location"`, recursive `children` (sub-locations), and `instances` array.
+- [ ] Each instance entry includes: `id`, `definition_id`, `definition_name`, `quantity`, `is_container`, `child_count`.
+- [ ] Instances are capped at **50 per location** node. When capped, `instance_truncated: true` and `instance_count` reflects the total (untruncated) count.
+- [ ] Instance `child_count` reflects the number of child instances inside a container (0 for non-containers). The container's children are NOT recursively expanded in the browse response — they are loaded on demand via `/instances/:id/contents`.
+- [ ] Locations and instances are sorted alphabetically by name (locations first, then instances grouped after).
+- [ ] Container instances at root-level (i.e., instances with `location_id` = root and `is_container = true`) are included in the root location's `instances` array.
+- [ ] Typecheck / build / test suite passes.
+
+### US-011: Instance Management from Tree (UI)
+**Description:** As a user, I want to create new instances directly from the browse tree without navigating to a detail page.
+
+**Acceptance Criteria:**
+- [ ] "+" box icon on a location node opens `CreateInstanceModal` with `location_id` pre-filled.
+- [ ] "+" box icon on a container instance node opens `CreateInstanceModal` with `parent_instance_id` pre-filled.
+- [ ] After successful creation, the tree node's instance list is invalidated and re-fetched (via TanStack Query invalidation of `['locations', 'tree-instances', locationId]`).
+- [ ] Successful creation shows a success toast. Failed creation shows an error toast.
+- [ ] **[UI]** Verified in browser.
+
 ---
 
 ## 5. Functional & Technical Requirements
@@ -186,12 +221,12 @@ The `locations` table and `settings.root_location_id` column are defined in the 
 
 ### 5.2 REST API Endpoints
 
-All endpoints under `/api/v1/locations`.
+All endpoints under `/api/v1/locations` except `/api/v1/browse` (which is a top-level route).
 
 | Method | Path | Description | Request Body | Response |
 |---|---|---|---|---|
 | `GET` | `/locations` | Flat list, optional `?parent_id=` filter | — | `Location[]` |
-| `GET` | `/locations/tree` | Full recursive tree | — | `TreeNode[]` |
+| `GET` | `/locations/tree` | Full recursive tree (locations only) | — | `TreeNode[]` |
 | `GET` | `/locations/:id` | Single location | — | `Location` |
 | `GET` | `/locations/:id/children` | Direct children only | — | `Location[]` |
 | `GET` | `/locations/:id/contents` | Sub-locations + item instances | — | `{ sub_locations: Location[], instances: InstanceSummary[] }` |
@@ -199,6 +234,7 @@ All endpoints under `/api/v1/locations`.
 | `POST` | `/locations` | Create | `{ name, description?, parent_id? }` | `Location` (201) |
 | `PUT` | `/locations/:id` | Update (partial) | `{ name?, description?, parent_id? }` | `Location` |
 | `DELETE` | `/locations/:id` | Delete (guarded) | — | 204 or 409 |
+| **`GET`** | **`/browse`** | **NEW** Full unified tree (locations + instances) | — | `BrowseNode[]` |
 
 **FR-2:** `POST /locations` validates:
 - `name`: required, 2–200 characters.
@@ -274,24 +310,79 @@ WITH RECURSIVE ancestors AS (
 SELECT id, name FROM ancestors ORDER BY depth DESC;
 ```
 
+**FR-8b:** `GET /api/v1/browse` returns the full unified tree:
+
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Home",
+    "description": "...",
+    "kind": "location",
+    "children": [
+      {
+        "id": "child-uuid",
+        "name": "Living Room",
+        "description": "...",
+        "kind": "location",
+        "children": [],
+        "instances": [
+          {
+            "id": "inst-uuid",
+            "definition_id": "...",
+            "definition_name": "Box of Screws",
+            "quantity": 1,
+            "is_container": true,
+            "child_count": 3
+          }
+        ],
+        "instance_count": 12,
+        "instance_truncated": false
+      }
+    ],
+    "instances": [],
+    "instance_count": 0,
+    "instance_truncated": false
+  }
+]
+```
+
+**Implementation details:**
+- Built from flat `locations` table (same two-pass algorithm as `GetTree()`) but augmented with instance data per node.
+- Instances per location are fetched with `LIMIT 51` (50 + 1 to detect truncation). Sorted alphabetically by `definition_name`.
+- `instance_truncated` = `true` when more than 50 instances exist at a location. `instance_count` = total unfiltered count.
+- `is_container` and `child_count` come from the item definition (`is_container` field) and a subquery counting child instances.
+- Container instance children are NOT recursively expanded — the frontend lazy-loads them via `/instances/:id/contents`.
+- Only instances with a direct `location_id` (not `parent_instance_id`) are included at each location node.
+
 ### 5.3 Frontend
 
 **FR-9:** Use TanStack Query with hierarchical keys:
+- `['browse']` — unified full tree (locations + instances).
 - `['locations']` — flat list.
-- `['locations', 'tree']` — full tree.
+- `['locations', 'tree']` — full tree (locations only).
 - `['locations', id]` — single location.
 - `['locations', id, 'children']` — direct children.
 - `['locations', id, 'contents']` — contents.
 - `['locations', id, 'breadcrumb']` — breadcrumb.
+- `['locations', id, 'instances']` — instances at a location (lazy-loaded on expand).
 
-**FR-10:** On any successful mutation (create/update/delete), invalidate `['locations']` and related keys. Use targeted invalidation — don't invalidate the entire tree if only one node changed.
+**FR-10:** On any successful mutation (create/update/delete), invalidate `['browse']`, `['locations']` and related keys. Use targeted invalidation — don't invalidate the entire tree if only one node changed.
 
 **FR-11:** The parent dropdown in create/edit forms must exclude:
 - The location being edited (can't be its own parent)
 - All descendants of the location being edited (prevents cycles)
 - (Optional optimization: fetch the full tree and filter client-side)
 
-**FR-12:** Tree browser lazy-loads children on expand using `/locations/:id/children`. Initially shows only top-level locations. Expanded state is tracked locally in component state.
+**FR-12:** Unified browse tree (`LocationTree` / `BrowseTree` component):
+- Initial load via `GET /api/v1/browse` — full tree with locations + capped instances.
+- On expand of a location node: lazy-load instances (if truncated) via `GET /api/v1/instances?location_id=:id&limit=50`.
+- On expand of a container instance node: lazy-load child instances via `GET /api/v1/instances/:id/contents`.
+- Node types: location (folder icon), container instance (box icon, expandable), non-container instance (tag icon, leaf).
+- Grouping: under each location, sub-locations render first (from `children`), then instances (from `instances` array).
+- Two action buttons per location node: +folder-icon → create sub-location modal, +box-icon → create instance modal.
+- One action button per container instance node: +box-icon → create instance modal (inside container).
+- Expanded state is tracked locally in component state. Lazy-loaded instance data is cached by TanStack Query.
 
 **FR-13:** All forms use HTML5 validation as first line + controlled component validation before submit.
 
@@ -322,10 +413,10 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 - **Location-level tags:** Tags apply to item definitions only (per overarching PRD).
 - **Standalone "Create Location" page or global button:** Location creation is always contextual — initiated from a Location Detail page with the parent pre-filled. No `/locations/new` route exists.
 - **Creating locations from instance pages:** Locations are created within locations only, never within items.
-- **Item instance details in tree:** Tree shows locations only, not items within them. Instance browsing happens in the Location Detail view.
 - **Search within location tree:** Deferred to PRD #10 (Search).
 - **Location images/photos:** Deferred to future photo attachment feature.
-- **Recursive item instance contents:** `contents` returns direct instances only. Recursive item-in-item resolution is PRD #8.
+- **Recursive item instance contents in browse endpoint:** The `/browse` endpoint does NOT recursively expand container instance children. Container children are lazy-loaded on expand via `/instances/:id/contents`.
+- **Recursive item instance contents in `/contents`:** `contents` returns direct instances only. Recursive item-in-item resolution is PRD #8.
 
 ---
 
@@ -333,8 +424,9 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 
 | # | Question | Status |
 |---|---|---|
-| OQ-1 | Should the tree endpoint include item counts per location (e.g., "Living Room (12 items)")? | Deferred — add `total_instance_count` field to tree nodes in v2 if dashboard PRD needs it. |
+| OQ-1 | Should the tree include instances and instance counts? | **Resolved — v2** implements a unified browse tree (`/browse` endpoint, `BrowseTree` component) with instances visible inline under each location. Instance count (`instance_count`) and truncation flag (`instance_truncated`) are part of the browse response. |
 | OQ-2 | Should moving a location also move its item instances (current behavior) or leave them orphaned? | Resolved — moving a location does NOT affect item instances (they stay at this location); changing `parent_id` only affects the location's position in the tree. Item instances are bound to the location by `location_id`, not by tree position. |
 | OQ-3 | Should location names be unique within a parent? | Deferred — v1 allows duplicates. Revisit if user feedback demands it. |
 | OQ-4 | Pagination for contents endpoint when > 500 instances? | Deferred — v1 returns all with a hard cap. Add cursor pagination in v2. |
 | OQ-5 | How should the user create a root-level location (no parent)? The UI is always contextual — the user is inside a location, so creating a sub-location is natural, but creating a sibling root is not. | Open — the API supports `parent_id = null` but there is no v1 UI entry point for it. Possible solutions: a "Create Top-Level Location" option in the location tree empty area, or a button on the root location's detail page. Deferred to implementation. |
+| OQ-6 | **v2** — Should the browse endpoint support a `?root_id=` filter to show only a subtree? | Deferred — v2 returns the full tree. Subtree filtering can be implemented client-side or added as a query param in v3. |

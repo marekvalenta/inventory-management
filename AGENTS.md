@@ -36,7 +36,7 @@
 | 3 | `prd-backend-architecture.md` | Go project layout, router, middleware, error handling, config, embed | ✅ Implemented |
 | 4 | `prd-frontend-architecture.md` | React/Vite/TS scaffold, TanStack Query, routing, CSS design system, nav | ✅ Implemented |
 | — | `prd-visual-design.md` | Complete visual design system — colors, typography, spacing, key page layouts, component states | ✅ Done |
-| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard | ✅ Implemented |
+| 5 | `prd-locations.md` | Locations CRUD — API + UI, tree browser, deletion guard → **v2: unified browse tree with instances** | 🔄 In Progress |
 | 6 | `prd-tags.md` | Tags CRUD — API + UI, deletion guard | ✅ Implemented |
 | 7 | `prd-item-definitions.md` | Definitions CRUD — API + UI, field schema, inheritance, tags | ✅ Implemented |
 | 8 | `prd-item-instances.md` | Instances CRUD — API + UI, smart move/split logic, breadcrumb | ✅ Implemented |
