@@ -231,6 +231,29 @@ export function LocationDetailPage() {
         {stacksData?.stacks && stacksData.stacks.length > 0 ? (
           <div className={styles.instanceList}>
             {stacksData.stacks.map((stack) => {
+              const isSingle = stack.instance_count === 1 && stack.single_instance_id
+              if (isSingle) {
+                return (
+                  <a
+                    key={stack.definition_id}
+                    href={`/instances/${stack.single_instance_id}`}
+                    className={styles.instanceItem}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      navigate(`/instances/${stack.single_instance_id}`)
+                    }}
+                  >
+                    <span className={styles.instanceName}>
+                      {stack.definition_name}
+                    </span>
+                    <div className={styles.stackMeta}>
+                      <span className={styles.instanceQuantity}>
+                        x{stack.total_quantity}
+                      </span>
+                    </div>
+                  </a>
+                )
+              }
               const params = new URLSearchParams()
               params.set('definition_id', stack.definition_id)
               params.set('location_id', id!)

@@ -8,6 +8,7 @@ export interface BrowseStack {
   instance_count: number
   is_container: boolean
   child_count: number
+  single_instance_id?: string | null
 }
 
 export interface StackListResult {

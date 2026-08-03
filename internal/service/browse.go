@@ -18,13 +18,14 @@ type BrowseNode struct {
 }
 
 type rawStack struct {
-	DefinitionID   string
-	DefinitionName string
-	Unit           sql.NullString
-	IsContainer    bool
-	TotalQuantity  int
-	InstanceCount  int
-	LocationID     string
+	DefinitionID     string
+	DefinitionName   string
+	Unit             sql.NullString
+	IsContainer      bool
+	TotalQuantity    int
+	InstanceCount    int
+	LocationID       string
+	FirstInstanceID  sql.NullString
 }
 
 type nodeAux struct {
@@ -104,7 +105,8 @@ func (s *BrowseService) GetBrowse() ([]BrowseNode, error) {
 			d.unit,
 			d.is_container,
 			COALESCE(SUM(i.quantity), 0) AS total_quantity,
-			COUNT(i.id) AS instance_count
+			COUNT(i.id) AS instance_count,
+			MIN(i.id) AS first_instance_id
 		FROM item_instances i
 		JOIN item_definitions d ON d.id = i.definition_id
 		WHERE i.location_id IS NOT NULL
@@ -119,7 +121,7 @@ func (s *BrowseService) GetBrowse() ([]BrowseNode, error) {
 	var allStacks []rawStack
 	for stackRows.Next() {
 		var rs rawStack
-		if err := stackRows.Scan(&rs.LocationID, &rs.DefinitionID, &rs.DefinitionName, &rs.Unit, &rs.IsContainer, &rs.TotalQuantity, &rs.InstanceCount); err != nil {
+		if err := stackRows.Scan(&rs.LocationID, &rs.DefinitionID, &rs.DefinitionName, &rs.Unit, &rs.IsContainer, &rs.TotalQuantity, &rs.InstanceCount, &rs.FirstInstanceID); err != nil {
 			return nil, fmt.Errorf("scan browse stack: %w", err)
 		}
 		allStacks = append(allStacks, rs)
@@ -155,6 +157,9 @@ func (s *BrowseService) GetBrowse() ([]BrowseNode, error) {
 			}
 			if rs.Unit.Valid {
 				stack.Unit = &rs.Unit.String
+			}
+			if rs.FirstInstanceID.Valid && rs.InstanceCount == 1 {
+				stack.SingleInstanceID = &rs.FirstInstanceID.String
 			}
 			stacks = append(stacks, stack)
 		}

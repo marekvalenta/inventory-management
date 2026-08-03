@@ -36,6 +36,7 @@ type StackResult struct {
 	ParentInstanceName *string `json:"parent_instance_name"`
 	TotalQuantity      int     `json:"total_quantity"`
 	InstanceCount      int     `json:"instance_count"`
+	SingleInstanceID   *string `json:"single_instance_id,omitempty"`
 }
 
 type TotalCounts struct {
@@ -193,7 +194,8 @@ func (s *SearchService) Search(params SearchParams) (*SearchResponse, error) {
 				i.parent_instance_id,
 				pi_def.name AS parent_instance_name,
 				COALESCE(SUM(i.quantity), 0) AS total_quantity,
-				COUNT(i.id) AS instance_count
+				COUNT(i.id) AS instance_count,
+				MIN(i.id) AS first_instance_id
 			FROM item_instances i
 			JOIN item_definitions d ON d.id = i.definition_id
 			LEFT JOIN locations l ON l.id = i.location_id
@@ -215,10 +217,12 @@ func (s *SearchService) Search(params SearchParams) (*SearchResponse, error) {
 		for rows.Next() {
 			var sr StackResult
 			var unit, locID, locName, parentInstID, parentInstName sql.NullString
+			var firstInstanceID sql.NullString
 			if err := rows.Scan(
 				&sr.DefinitionID, &sr.DefinitionName, &unit,
 				&locID, &locName, &parentInstID, &parentInstName,
 				&sr.TotalQuantity, &sr.InstanceCount,
+				&firstInstanceID,
 			); err != nil {
 				return nil, fmt.Errorf("scan stack result: %w", err)
 			}
@@ -232,6 +236,9 @@ func (s *SearchService) Search(params SearchParams) (*SearchResponse, error) {
 			if parentInstID.Valid {
 				sr.ParentInstanceID = &parentInstID.String
 				sr.ParentInstanceName = &parentInstName.String
+			}
+			if firstInstanceID.Valid && sr.InstanceCount == 1 {
+				sr.SingleInstanceID = &firstInstanceID.String
 			}
 			stacks = append(stacks, sr)
 		}

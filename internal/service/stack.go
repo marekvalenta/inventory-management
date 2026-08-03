@@ -21,6 +21,7 @@ type BrowseStack struct {
 	InstanceCount      int     `json:"instance_count"`
 	IsContainer        bool    `json:"is_container"`
 	ChildCount         int     `json:"child_count"`
+	SingleInstanceID   *string `json:"single_instance_id,omitempty"`
 }
 
 type StackListResult struct {
@@ -104,7 +105,8 @@ func stackListBaseQuery(whereClause string) string {
 			i.parent_instance_id,
 			pi_def.name AS parent_instance_name,
 			COALESCE(SUM(i.quantity), 0) AS total_quantity,
-			COUNT(i.id) AS instance_count
+			COUNT(i.id) AS instance_count,
+			MIN(i.id) AS first_instance_id
 		FROM item_instances i
 		JOIN item_definitions d ON d.id = i.definition_id
 		LEFT JOIN locations l ON l.id = i.location_id
@@ -141,11 +143,13 @@ func (s *StackService) List(locationID, parentInstanceID *string) (*StackListRes
 		var stack BrowseStack
 		var locID, locName, parentInstID, parentInstName sql.NullString
 		var unit sql.NullString
+		var firstInstanceID sql.NullString
 
 		if err := rows.Scan(
 			&stack.DefinitionID, &stack.DefinitionName, &unit, &stack.IsContainer,
 			&locID, &locName, &parentInstID, &parentInstName,
 			&stack.TotalQuantity, &stack.InstanceCount,
+			&firstInstanceID,
 		); err != nil {
 			return nil, fmt.Errorf("scan stack: %w", err)
 		}
@@ -160,6 +164,9 @@ func (s *StackService) List(locationID, parentInstanceID *string) (*StackListRes
 		if parentInstID.Valid {
 			stack.ParentInstanceID = &parentInstID.String
 			stack.ParentInstanceName = &parentInstName.String
+		}
+		if firstInstanceID.Valid && stack.InstanceCount == 1 {
+			stack.SingleInstanceID = &firstInstanceID.String
 		}
 
 		stacks = append(stacks, stack)

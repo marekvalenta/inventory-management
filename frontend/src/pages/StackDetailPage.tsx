@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
@@ -51,6 +51,16 @@ export function StackDetailPage() {
     enabled: !!hasParent && !validationError,
   })
 
+  const singleInstanceId =
+    stack && stack.instance_count === 1 && stack.instances.length === 1
+      ? stack.instances[0].id
+      : null
+  useEffect(() => {
+    if (singleInstanceId) {
+      navigate(`/instances/${singleInstanceId}`, { replace: true })
+    }
+  }, [singleInstanceId, navigate])
+
   if (!hasParent || validationError) {
     return (
       <div className={styles.container}>
@@ -84,6 +94,14 @@ export function StackDetailPage() {
         <div className={styles.error}>
           {error instanceof Error ? error.message : 'Failed to load stack'}
         </div>
+      </div>
+    )
+  }
+
+  if (singleInstanceId) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.loading}>Redirecting to instance...</div>
       </div>
     )
   }

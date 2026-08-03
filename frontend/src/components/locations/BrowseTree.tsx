@@ -34,12 +34,19 @@ function StackNode({
   })
 
   const isContainer = stack.is_container && stack.child_count > 0
-  const stackDetailParams = new URLSearchParams()
-  stackDetailParams.set('definition_id', stack.definition_id)
-  if (locationId) {
-    stackDetailParams.set('location_id', locationId)
+  const isSingleInstance = stack.instance_count === 1 && stack.single_instance_id
+
+  let linkUrl: string
+  if (isSingleInstance) {
+    linkUrl = `/instances/${stack.single_instance_id}`
+  } else {
+    const params = new URLSearchParams()
+    params.set('definition_id', stack.definition_id)
+    if (locationId) {
+      params.set('location_id', locationId)
+    }
+    linkUrl = `/stacks?${params.toString()}`
   }
-  const stackDetailUrl = `/stacks?${stackDetailParams.toString()}`
 
   return (
     <div className={styles.node}>
@@ -71,11 +78,13 @@ function StackNode({
         <span className={styles.instanceIcon}>
           <CubeIcon width={18} height={18} />
         </span>
-        <Link to={stackDetailUrl} className={styles.name}>
+        <Link to={linkUrl} className={styles.name}>
           {stack.definition_name}
         </Link>
         <span className={styles.quantityBadge}>&times;{stack.total_quantity}</span>
-        <span className={styles.countLabel}>{stack.instance_count} instances</span>
+        {!isSingleInstance && (
+          <span className={styles.countLabel}>{stack.instance_count} instances</span>
+        )}
         <button
           className={styles.addButton}
           onClick={(e) => {
