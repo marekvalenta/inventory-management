@@ -360,7 +360,7 @@ Apply to: hover states (`--transition-fast`), modals/toggles (`--transition-base
 |  [*]        [{]        [#]  [=]  |
 +-----------------------------------+
 ```
-- `[D]` = sub-location folder icon, `[B]` = item/box icon, `[>]` = navigate arrow
+- `[>]` = navigate arrow
 - Section headers: `--text-h3`, padding `--space-md`
 - Location info card: name `--text-h2`, description `--text-small` `--text-secondary`
 - Action buttons: Secondary variant (outlined), 36px height

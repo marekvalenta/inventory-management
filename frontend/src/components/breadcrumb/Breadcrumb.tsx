@@ -1,4 +1,4 @@
-import { ChevronRightIcon, HomeIcon } from '@radix-ui/react-icons'
+import { ChevronRightIcon, ArchiveIcon } from '@radix-ui/react-icons'
 import { Link } from 'react-router-dom'
 import styles from './Breadcrumb.module.css'
 
@@ -23,7 +23,7 @@ export function Breadcrumb({ nodes }: BreadcrumbProps) {
         return (
           <span key={node.id} className={styles.item}>
             {index > 0 && <ChevronRightIcon className={styles.separator} width={16} height={16} />}
-            {index === 0 && <HomeIcon className={styles.homeIcon} width={16} height={16} />}
+            {index === 0 && <ArchiveIcon className={styles.homeIcon} width={16} height={16} />}
             {isLast ? (
               <span className={styles.current}>{node.name}</span>
             ) : (

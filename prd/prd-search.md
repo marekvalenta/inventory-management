@@ -130,7 +130,7 @@ Users need to quickly find locations, item definitions, and/or item instances by
   - `N` = total matching count for that type (from `total_counts` in API response).
 - [ ] Each section header: `--text-caption`, `--color-text-secondary`, uppercase, padded.
 - [ ] Each result row shows:
-  - Entity type icon (16x16px): folder for locations, tag/file for definitions, box for instances.
+  - Entity type icon (16x16px): archive for locations, clipboard for definitions, cube for instances.
   - Entity name (`--text-body-strong`).
   - Subtitle line (`--text-caption`, `--color-text-secondary`): location → parent location name (if not root); definition → unit (if set); instance → "xQTY — in LocationName".
 - [ ] If a section has 0 results, the section is hidden entirely.

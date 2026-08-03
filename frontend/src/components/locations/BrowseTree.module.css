@@ -1,0 +1,143 @@
+.tree {
+  display: flex;
+  flex-direction: column;
+}
+
+.node {
+  display: flex;
+  flex-direction: column;
+}
+
+.nodeRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  min-height: 44px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.nodeRow:hover {
+  background-color: var(--color-bg-surface);
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.expandButton:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-surface-alt);
+}
+
+.expandButton:disabled {
+  cursor: default;
+}
+
+.instanceIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.name {
+  flex: 1;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  font: var(--text-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: var(--space-xs);
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.name:hover {
+  color: var(--color-accent);
+}
+
+.quantityBadge {
+  display: flex;
+  align-items: center;
+  padding: 2px var(--space-sm);
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  border-radius: var(--radius-full);
+  font: var(--text-small);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.addButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+  font: var(--text-small);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  min-height: 32px;
+  flex-shrink: 0;
+}
+
+.addButton:hover {
+  background: var(--color-accent-hover);
+}
+
+.divider {
+  height: 1px;
+  margin: var(--space-xs) var(--space-md);
+  background-color: var(--color-border);
+}
+
+.truncatedHint {
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+}
+
+.truncatedHint a {
+  color: var(--color-text-secondary);
+  font: var(--text-small);
+  text-decoration: none;
+}
+
+.truncatedHint a:hover {
+  color: var(--color-accent);
+}
+
+.empty {
+  padding: var(--space-3xl);
+  text-align: center;
+  color: var(--color-text-secondary);
+  font: var(--text-body);
+}

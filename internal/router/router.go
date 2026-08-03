@@ -39,6 +39,8 @@ func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 	instanceHandler := handler.NewInstanceHandler(instanceSvc)
 	dashboardSvc := service.NewDashboardService(db)
 	dashboardHandler := handler.NewDashboardHandler(dashboardSvc)
+	browseSvc := service.NewBrowseService(db)
+	browseHandler := handler.NewBrowseHandler(browseSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
@@ -47,6 +49,7 @@ func New(embeddedFrontend fs.FS, db *sql.DB) chi.Router {
 		tagHandler.RegisterRoutes(r)
 		definitionHandler.RegisterRoutes(r)
 		instanceHandler.RegisterRoutes(r)
+		r.Get("/browse", browseHandler.Browse)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {
@@ -80,6 +83,8 @@ func NewTestRouter(db *sql.DB) chi.Router {
 	instanceHandler := handler.NewInstanceHandler(instanceSvc)
 	dashboardSvc := service.NewDashboardService(db)
 	dashboardHandler := handler.NewDashboardHandler(dashboardSvc)
+	browseSvc := service.NewBrowseService(db)
+	browseHandler := handler.NewBrowseHandler(browseSvc)
 
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/health", handler.HealthHandler())
@@ -88,6 +93,7 @@ func NewTestRouter(db *sql.DB) chi.Router {
 		tagHandler.RegisterRoutes(r)
 		definitionHandler.RegisterRoutes(r)
 		instanceHandler.RegisterRoutes(r)
+		r.Get("/browse", browseHandler.Browse)
 	})
 
 	r.NotFound(func(w http.ResponseWriter, r *http.Request) {

@@ -146,15 +146,15 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 
 **Acceptance Criteria:**
 - [ ] Tree page (`/locations`) loads the full tree upfront via `GET /api/v1/browse`.
-- [ ] Tree nodes are mixed: locations (folder icon) and instances (box/tag icon) rendered under each location.
+- [ ] Tree nodes are mixed: locations (archive icon) and instances (cube icon) rendered under each location.
 - [ ] **Grouping:** Under each expanded location, sub-locations render first, then a subtle divider, then instances below.
 - [ ] Each location node is clickable → navigates to `/locations/:id`. Each instance node is clickable → navigates to `/instances/:id`.
 - [ ] Instance nodes show a quantity badge (e.g., "×5") to the right of the name.
 - [ ] Container instances (those with `is_container = true` and `child_count > 0`) display a chevron and are expandable. Expanding a container instance lazy-loads child instances via `GET /api/v1/instances/:id/contents`.
 - [ ] Non-container instances show no expand toggle.
 - [ ] **Instance capping:** Maximum 50 instances shown per location. If truncated, a "(+N more)" link appears below the visible instances, linking to `/locations/:id` (the Location Detail page).
-- [ ] **Two action buttons** per location node: "+" folder icon → opens CreateEditModal for a new sub-location (existing behavior); "+" box icon → opens CreateInstanceModal with the location pre-filled as `location_id`.
-- [ ] **Two action buttons** per container instance node: "+" box icon → opens CreateInstanceModal with the container instance pre-filled as `parent_instance_id`. No location-add button on instance nodes.
+- [ ] **Two action buttons** per location node: "+" archive icon → opens CreateEditModal for a new sub-location (existing behavior); "+" cube icon → opens CreateInstanceModal with the location pre-filled as `location_id`.
+- [ ] **Two action buttons** per container instance node: "+" cube icon → opens CreateInstanceModal with the container instance pre-filled as `parent_instance_id`. No location-add button on instance nodes.
 - [ ] Mobile: full-width tree, indentation shows hierarchy, tap to expand/collapse, 44×44px touch targets for expand and action buttons.
 - [ ] Desktop: indent markers, hover states, larger spacing between groups.
 - [ ] Empty state: if only the root location exists with no instances, show "No locations or items yet — tap + to add" prompt.
@@ -201,8 +201,8 @@ Locations are the hierarchical backbone of the inventory system. They represent 
 **Description:** As a user, I want to create new instances directly from the browse tree without navigating to a detail page.
 
 **Acceptance Criteria:**
-- [ ] "+" box icon on a location node opens `CreateInstanceModal` with `location_id` pre-filled.
-- [ ] "+" box icon on a container instance node opens `CreateInstanceModal` with `parent_instance_id` pre-filled.
+- [ ] "+" cube icon on a location node opens `CreateInstanceModal` with `location_id` pre-filled.
+- [ ] "+" cube icon on a container instance node opens `CreateInstanceModal` with `parent_instance_id` pre-filled.
 - [ ] After successful creation, the tree node's instance list is invalidated and re-fetched (via TanStack Query invalidation of `['locations', 'tree-instances', locationId]`).
 - [ ] Successful creation shows a success toast. Failed creation shows an error toast.
 - [ ] **[UI]** Verified in browser.
@@ -378,10 +378,10 @@ SELECT id, name FROM ancestors ORDER BY depth DESC;
 - Initial load via `GET /api/v1/browse` — full tree with locations + capped instances.
 - On expand of a location node: lazy-load instances (if truncated) via `GET /api/v1/instances?location_id=:id&limit=50`.
 - On expand of a container instance node: lazy-load child instances via `GET /api/v1/instances/:id/contents`.
-- Node types: location (folder icon), container instance (box icon, expandable), non-container instance (tag icon, leaf).
+- Node types: location (archive icon), container instance (cube icon, expandable), non-container instance (cube icon, leaf).
 - Grouping: under each location, sub-locations render first (from `children`), then instances (from `instances` array).
-- Two action buttons per location node: +folder-icon → create sub-location modal, +box-icon → create instance modal.
-- One action button per container instance node: +box-icon → create instance modal (inside container).
+- Two action buttons per location node: +archive-icon → create sub-location modal, +cube-icon → create instance modal.
+- One action button per container instance node: +cube-icon → create instance modal (inside container).
 - Expanded state is tracked locally in component state. Lazy-loaded instance data is cached by TanStack Query.
 
 **FR-13:** All forms use HTML5 validation as first line + controlled component validation before submit.

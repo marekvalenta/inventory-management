@@ -1,10 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { HomeIcon, CubeIcon, BookmarkIcon, GearIcon } from '@radix-ui/react-icons'
+import { ArchiveIcon, ClipboardIcon, BookmarkIcon, GearIcon } from '@radix-ui/react-icons'
 import styles from './DesktopLayout.module.css'
 
 const primaryNav = [
-  { to: '/locations', label: 'Locations', icon: HomeIcon },
-  { to: '/definitions', label: 'Definitions', icon: CubeIcon },
+    { to: '/locations', label: 'Browse', icon: ArchiveIcon },
+  { to: '/definitions', label: 'Definitions', icon: ClipboardIcon },
   { to: '/tags', label: 'Tags', icon: BookmarkIcon },
 ]
 

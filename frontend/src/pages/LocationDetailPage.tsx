@@ -6,7 +6,7 @@ import {
   Pencil1Icon,
   TrashIcon,
   CubeIcon,
-  HomeIcon,
+  ArchiveIcon,
 } from '@radix-ui/react-icons'
 import {
   fetchLocation,
@@ -189,7 +189,7 @@ export function LocationDetailPage() {
 
       <section className={styles.section}>
         <h2 className={styles.sectionTitle}>
-          <HomeIcon width={20} height={20} />
+          <ArchiveIcon width={20} height={20} />
           Sub-locations
         </h2>
         {contentsLoading ? (

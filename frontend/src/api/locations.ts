@@ -38,6 +38,26 @@ export interface DeleteBlock {
   instance_count: number
 }
 
+export interface BrowseInstance {
+  id: string
+  definition_id: string
+  definition_name: string
+  quantity: number
+  is_container: boolean
+  child_count: number
+}
+
+export interface BrowseNode {
+  id: string
+  name: string
+  description: string | null
+  kind: 'location'
+  children: BrowseNode[]
+  instances: BrowseInstance[]
+  instance_count: number
+  instance_truncated: boolean
+}
+
 export interface CreateLocationRequest {
   name: string
   description?: string | null
@@ -57,6 +77,10 @@ export function fetchLocations(parentId?: string): Promise<Location[]> {
 
 export function fetchLocationTree(): Promise<TreeNode[]> {
   return apiFetch<TreeNode[]>('/api/v1/locations/tree')
+}
+
+export function fetchBrowse(): Promise<BrowseNode[]> {
+  return apiFetch<BrowseNode[]>('/api/v1/browse')
 }
 
 export function fetchLocation(id: string): Promise<Location> {

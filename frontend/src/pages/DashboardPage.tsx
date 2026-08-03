@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import {
-  HomeIcon,
+  ArchiveIcon,
+  ClipboardIcon,
   CubeIcon,
-  LayersIcon,
   StackIcon,
   ChevronRightIcon,
   ChevronDownIcon,
@@ -61,19 +61,19 @@ function StatCards({ stats, isOnboarding }: { stats: DashboardData['stats']; isO
     {
       label: 'Locations',
       value: stats.locations_count,
-      icon: HomeIcon,
+      icon: ArchiveIcon,
       to: '/locations',
     },
     {
       label: 'Definitions',
       value: stats.definitions_count,
-      icon: CubeIcon,
+      icon: ClipboardIcon,
       to: '/definitions',
     },
     {
       label: 'Instances',
       value: stats.instances_count,
-      icon: LayersIcon,
+      icon: CubeIcon,
       to: '/locations',
     },
     {
@@ -169,7 +169,7 @@ function LocationRow({
         )}
         {node.children.length === 0 && <span className={styles.expandSpacer} />}
         <Link to={`/locations/${node.id}`} className={styles.rowLink}>
-          <HomeIcon className={styles.rowIcon} width={16} height={16} />
+          <ArchiveIcon className={styles.rowIcon} width={16} height={16} />
           <span className={styles.rowName}>{node.name}</span>
         </Link>
         <span className={styles.rowBadge}>{node.instance_count.toLocaleString()}</span>
